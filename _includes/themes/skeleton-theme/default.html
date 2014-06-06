@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ page.title }}</title>
+    {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
+    <meta name="author" content="{{ site.author.name }}">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  -->
+  </head>
+
+  <body>
+      <div id="header" class="container">
+          <div id="header-container" class="sixteem columns">
+              <div id="branding">
+                  <h1><a href="{{ HOME_PATH }}">{{ site.title }}</a></h1>
+                  <h5>{{ site.author.name }}'s personal blog</h5>
+              </div>
+              <div id="layout-navigation">
+                  {% assign pages_list = site.pages %}
+                  {% assign group = 'navigation' %}
+                  {% include JB/pages_list %}
+              </div>
+          </div>
+      </div>
+      <div id="body-container" class="container">
+        <div class="content eleven columns">
+          {{ content }}
+        </div>
+        <div class="sidebar five columns">
+          <article class="widget-AboutMe widget-sidebar widget-html-widget widget">
+              <header>
+                  <h1>About me</h1>
+              </header>
+              <p>My name is Alexey Rodiontsev. I&rsquo;m a software engineer at Irdeto B.V., Amsterdam, The Netherlands.</p>
+          </article>
+          <article class="widget">
+              <header>
+                  <h1>Connect</h1> 
+              </header>
+              <p>
+                <a href="https://twitter.com/{{ site.author.twitter }}" title="twitter">
+                  <img src="{{ ASSET_PATH }}/sidebar/c-icon-twi.png" alt="" width="64" height="64" />
+                </a>
+                <a href="https://github.com/{{ site.author.github }}" title="GitHub">
+                  <img src="{{ ASSET_PATH }}/sidebar/c-icon-git.png" alt="" width="64" height="64" />
+                </a>
+                <a href="http://www.linkedin.com/in/alexeyrodiontsev" title="Linked In">
+                  <img src="{{ ASSET_PATH }}/sidebar/c-icon-in.png" alt="" width="64" height="64" />
+                </a>
+                <a href="http://feeds.feedburner.com/mylifeecho" title="RSS">
+                  <img src="{{ ASSET_PATH }}/sidear/c-icon-rss.png" alt="" width="64" height="64" />
+                </a>
+                <a href="http://stackoverflow.com/users/793874/" title="stackoverflow">
+                  <img src="{{ ASSET_PATH }}/sidebar/icon-stacko.png" alt="" width="64" height="64" />
+                </a>
+                <a href="https://github.com/mylifeecho" title="examples">
+                  <img src="{{ ASSET_PATH }}/sidebar/c-icon-git.png" alt="" style="margin-left: 5px; margin-bottom: 3px;" width="32" height="32" />
+                </a>
+              </p>
+          </article>
+          <article class="widget">
+              <header>
+                  <h1>Recommended Reading</h1>
+              </header>
+              <ul style="padding-left: 0;">
+                <li><a href="/books#code-complete">Code Complete</a></li>
+                <li><a href="/books#design-patterns">Design patterns : elements of reusable object-oriented software</a></li>
+                <li><a href="/books#csharp-in-a-nutshell">C# in a Nutshell</a></li>
+                <li><a href="/books#31days-of-refactoring">31 days of refactoring</a></li>
+              </ul>
+              <p></p>
+          </article>
+          <article class="widget">
+              <header>
+                  <h1>Badges</h1>
+              </header>
+              <p>
+                <a href="/certifications">
+                  <img src="{{ ASSET_PATH }}/sidebar/MCSD(rgb)_1477.png" alt="MCSD: Web Applications" style="float: initial;" width="217" height="63" />
+                </a>
+              </p>
+          <p></p>
+          </article>
+        </div>
+      </div>
+      
+      <div id="footer-wrapper">
+          <footer>
+              <p>&copy; {{ site.time | date: '%Y' }} {{ site.author.name }}
+                with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+              </p>
+          </footer>
+      </div>
+
+    {% include JB/analytics %}
+  </body>
+</html>
