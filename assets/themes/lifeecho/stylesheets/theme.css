@@ -57,11 +57,11 @@ h5 {
     font-size: 105%;
 }
 
-p a:focus, p a:hover {
+a, p a:focus, a, p a:hover {
     text-decoration: underline;
 }
 
-p a {
+a, p a {
     color: #0B307F;
     text-decoration: none;
 }
@@ -222,7 +222,7 @@ dfn {
 }
 
 .summary p a, .blog-post p a, .page p a  {
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .share-this-bottom {
