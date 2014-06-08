@@ -57,11 +57,11 @@ h5 {
     font-size: 105%;
 }
 
-a:focus, a:hover {
+p a:focus, p a:hover {
     text-decoration: underline;
 }
 
-a {
+p a {
     color: #0B307F;
     text-decoration: none;
 }
