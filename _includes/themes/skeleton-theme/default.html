@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>{{ page.title }}</title>
+    <title>{{ site.title }} - {{ page.title }}</title>
     {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
     <meta name="author" content="{{ site.author.name }}">
 
@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ ASSET_PATH }}/stylesheets/skeleton.css">
     <link rel="stylesheet" href="{{ ASSET_PATH }}/stylesheets/layout.css">
     <link rel="stylesheet" href="{{ ASSET_PATH }}/stylesheets/theme.css">
+    <link rel="stylesheet" href="{{ ASSET_PATH }}/stylesheets/github.css">
 
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -37,7 +38,7 @@
                   <nav>
                     <ul class="menu menu-main-menu">
                       <li class="first"><a href="{{ HOME_PATH }}">Blog</a></li>
-                      <li><a href="{{ BASE_PATH }}/notes-tips-and-tricks">Notes, Tips and Tricks</a></li>
+                      <li><a href="{{ BASE_PATH }}/notes-tips-tricks">Notes, Tips and Tricks</a></li>
                       <li class="last"><a href="{{ BASE_PATH }}/about">About</a></li>
                     </ul>
                   </nav>
