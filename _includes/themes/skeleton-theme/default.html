@@ -27,16 +27,16 @@
   </head>
 
   <body>
-      <div id="header" class="container">
-          <div id="header-container">
-              <div id="branding">
+      <div id="header" class="sixteen columns">
+          <div id="header-container" class="container">
+              <div id="branding" class="five columns">
                   <h1><a href="{{ HOME_PATH }}">{{ site.title }}</a></h1>
                   <h5>{{ site.author.name }}'s personal blog</h5>
               </div>
               <div id="layout-navigation">
                   <nav>
                     <ul class="menu menu-main-menu">
-                      <li class="first"><a href="{{ BASE_PATH }}">Blog</a></li>
+                      <li class="first"><a href="{{ HOME_PATH }}">Blog</a></li>
                       <li><a href="{{ BASE_PATH }}/notes-tips-and-tricks">Notes, Tips and Tricks</a></li>
                       <li class="last"><a href="{{ BASE_PATH }}/about">About</a></li>
                     </ul>

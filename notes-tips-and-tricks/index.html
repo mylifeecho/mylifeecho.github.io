@@ -1,0 +1,8 @@
+---
+layout: page
+title: Notes, tips and tricks
+---
+
+{% for post in site.categories["notes"] %}
+    <li>{{ post.title }}</li>
+{% endfor %}
