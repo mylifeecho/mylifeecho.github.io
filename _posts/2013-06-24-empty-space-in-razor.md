@@ -1,9 +1,9 @@
 ---
 layout: post
 title: "Empty space in Razor"
-description: ""
 category: "notes-tips-tricks"
-tags: ASP.NET MVC, Razor
+tags: ["ASP.NET MVC", "Razor"]
+description: When we use Razor view engine to generate text trying to keep well formated code like this
 ---
 {% include JB/setup %}
 

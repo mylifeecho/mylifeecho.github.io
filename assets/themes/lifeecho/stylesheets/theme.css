@@ -61,7 +61,7 @@ a, p a:focus, a, p a:hover {
     text-decoration: underline;
 }
 
-a, p a {
+a, p a, a:visited, p a:visited {
     color: #0B307F;
     text-decoration: none;
 }
@@ -154,15 +154,12 @@ nav ul a {
     visibility: hidden;
 }
 
-.zone-sidebar {
+.sidebar {
     font-size: 0.8824em;
-    padding-left: 30px;
-    margin-top: 0;
 }
 
-.zone-sidebar h1 {
-    margin-bottom: 1em;
-    font-size: 1.3333em;
+.sidebar h3 {
+    margin-bottom: 0.7em;
 }
 
 .blog-posts {
@@ -183,9 +180,19 @@ nav ul a {
 }
 
 .blog-post {
-    margin: 20px 0;
+    margin-bottom: 20px;
     background: #fff;
     position: relative;
+}
+
+.tags {
+    display: inline-block;
+    margin-bottom: 1em;
+}
+
+.tags ul, .blog-post .tags ul li {
+    margin-left: 0;
+    display: inherit;
 }
 
 .tags a {
@@ -222,7 +229,7 @@ dfn {
 }
 
 .summary p a, .blog-post p a, .page p a  {
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .share-this-bottom {

@@ -2,14 +2,12 @@
   <header>
     <h1>{{ page.title }} </h1>
     {% unless page.tags == empty %}
-    <p class="tags">
-        
+    <div class="tags">Tags:
       <ul class="tag_box inline">
-      <li><i class="icon-tags"></i></li>
-      {% assign tags_list = page.tags %}
-      {% include JB/tags_list %}
+        {% assign tags_list = page.tags %}
+        {% include JB/tags_list %}
       </ul>
-    </p>
+    </div>
     {% endunless %}
     <div class="metadata">
       <div class="published">{{ page.date | date_to_long_string }}</div>
