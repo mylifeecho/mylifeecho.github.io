@@ -30,7 +30,7 @@ Key notes:
 3. For syntax highlighting I use Rouge. But keep in mind, you have to add styles manually. I have found CSS [here][css]
 
 This blog post is first post created with using Jekyll, but hopefully not last one. 
-One small thing, I have to migrate all data from Orchard based blog to new one...
+Still, I have to migrate all data from Orchard based blog to new one... :(
 
 [orchard]: http://www.orchardproject.net/
 [gp]: https://help.github.com/articles/what-are-github-pages
