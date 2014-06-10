@@ -17,7 +17,7 @@ Why to choose Jekyll?
 
 2. Whole blog is on file system with all text content, pictures, etc.
 
-3. As result you can use git for version control (and you should for GitHub).
+3. As result you can use git for version control (and you should for GitHub Pages).
 
 4. You can use markup language to write posts instead of ugly way to use built in WYSWYG editor or write pure html.
 
