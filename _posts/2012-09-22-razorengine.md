@@ -11,7 +11,7 @@ You can use *.cshtml* templates to create text content, for example for massive 
 
 1. You can make it something like this:
 
-```csthml
+```csharp
 public static string RenderPartialViewToString(Controller controller, string viewName, object model) {
     controller.ViewData.Model = model;
     using (StringWriter sw = new StringWriter()) {
@@ -32,7 +32,7 @@ But we need a controller context in this case. And as an advantage of this metho
 
 2. Also we can use [RazorEngine][1], but without using helpers. If you are going to use them, you should know that there is a tricky way to interact with helpers([link][2]).
 
-```cshtml
+```csharp
 string template = "Hello @Model.Name! Welcome to Razor!";
 string result = Razor.Parse(template, new { Name = "World" });
 ```
