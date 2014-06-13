@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "EF Code First Attached/Detached entities"
-description: ""
+description: "POCO-classes in Entity Framework Code First might have two states: attached and detached. In the state attached to the context all changes are detected and in case they exist, the use of method SaveChanges() writes current state to database. If the object is not attached, the changes won't certainly be detected and saved to the database."
 category: "notes-tips-tricks"
 tags: [EF Code First]
 ---
