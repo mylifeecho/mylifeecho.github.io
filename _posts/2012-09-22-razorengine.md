@@ -1,13 +1,13 @@
 ---
 layout: post
 title: "RazorEngine"
-description: "You can use *.cshtml templates to create text content, for example for massive email sending slightly different for each user. There are at least two ways to do it."
+description: "You can use .cshtml templates to create text content, for example for massive email sending slightly different for each user. There are at least two ways to do it."
 category: "notes-tips-tricks"
 tags: ["ASP.NET MVC", "Razor"]
 ---
 {% include JB/setup %}
 
-You can use **.cshtml* templates to create text content, for example for massive email sending slightly different for each user. There are at least two ways to do it.
+You can use *.cshtml* templates to create text content, for example for massive email sending slightly different for each user. There are at least two ways to do it.
 
 1. You can make it something like this:
 
