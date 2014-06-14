@@ -7,7 +7,7 @@ tags: ["Web"]
 ---
 {% include JB/setup %}
 
-The Performance Golden Rule in web development: **“80-90% of the end-user response time is spent on the frontend.”**
+The Performance Golden Rule in web development: **80-90% of the end-user response time is spent on the frontend.**
 
 Backend time is the time from request to a server and until the first byte is returned from server to client.
 
