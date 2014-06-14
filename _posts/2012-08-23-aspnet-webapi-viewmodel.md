@@ -1,8 +1,8 @@
 ---
 layout: post
 title: "ASP.NET WebAPI ViewModel"
-description: "It is quite often objects, which are aimed to transfer a data between a client and a server or to represent the objects of the real world, are different from data-access layer or buisness logic objects. In this case it is recommended to use DTO. Concerning ASP.NET WebAPI that designed by MVC pattern DTO can be used as a view model in client/server interaction. There are recommendations for ASP.NET MVC to use View Model object to transfer information to View instead of Entity Framework enities for example, and for WebAPI it is more actual. For convertion Model to View Model and back it is very convenient to use AutoMapper. NuGet easily allows to add this library to the project (type into your Package manager console: Install-Package AutoMapper)."
-category: "dev"
+description: "It is quite often objects, which are aimed to transfer a data between a client and a server or to represent the objects of the real world, are different from data-access layer or buisness logic objects. In this case it is recommended to use DTO. Concerning ASP.NET WebAPI that designed by MVC pattern DTO can be used as a view model in client-server interaction. There are recommendations for ASP.NET MVC to use View Model object to transfer information to View instead of Entity Framework enities for example, and for WebAPI it is more actual. For convertion Model to View Model and back it is very convenient to use AutoMapper."
+category: dev
 tags: ["DTO", "ASP.NET WebAPI", "AutoMapper"]
 ---
 {% include JB/setup %}
