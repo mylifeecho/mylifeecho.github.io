@@ -11,6 +11,8 @@ pre, code {
   box-shadow: 3px 3px rgba(0,0,0,0.1);
   margin: 20px 0 20px 0;
   overflow-y: hidden;
+  line-height: normal;
+  font-size: 0.95em;
 }
 
 .hll { background-color: #ffffcc }
