@@ -3,6 +3,26 @@ layout: page
 title: Notes, tips and tricks
 ---
 
+<ul class="blog-posts content-items">
 {% for post in site.categories["notes-tips-tricks"] %}
-    <li>{{ post.title }}</li>
+	<li>
+	<article class="blog-post">
+	    <header>
+			<h1><a href="{{ BASE_PATH }}{{ post.url }}">{{ post.title }}</a></h1>
+	        <div class="metadata">
+	            <div class="published">{{ post.date | date_to_string }}</div>
+	        </div>
+	    </header>
+	    
+		<p class="summary">
+			{% if post.description %}
+			<span class="body">{{ post.description | strip_html }}</span>
+			{% else %}
+			<span class="body">{{ post.excerpt | strip_html }}</span>
+			{% endif %}
+		</p> 
+		<span class="more"><a href="{{ BASE_PATH }}{{ post.url }}">Read more...</a></span>
+	</article></li>
 {% endfor %}
+</ul>
+
