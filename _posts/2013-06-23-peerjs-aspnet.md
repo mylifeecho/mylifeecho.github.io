@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "PeerJS + ASP.NET"
-description: ""
+description: "Progress in Web development astonishes. We spend less time using desktop applications and more time using only browser. There are powerful web tools like Google Drive and Office Live, online dictionaries and translators, messengers, graphics editors, 3D games and even IDEs. You need just have the Internet and modern browser. More and more features constantly appear. And one of them is peer-to-peer networking between browsers. Now I’m going to show how you can add peer-2-peer interaction between clients into your ASP.NET application with using PeerJS step by step."
 category: dev
 tags: [ PeerJS, Node.js, iisnode, ASP.NET, peer-2-peer ]
 ---
@@ -91,8 +91,8 @@ About detailed and actual status of relations between WebRTC and PeerJS you can 
 * [https://github.com/peers/peerjs-server](https://github.com/peers/peerjs-server) - source code of PeerJS Server
 
 [peerjs]: http://peerjs.com
-[peerjs-gs]: http://peerjs.com/start
-[peerjs-api]: https://github.com/peers/peerjs/blob/master/docs/api.md
+[peerjs-gs]: http://peerjs.com/docs/#start
+[peerjs-api]: http://peerjs.com/docs/#api
 [peerjs-demo]: https://github.com/peers/peerjs/tree/master/examples
 [peerjs-chat]: http://cdn.peerjs.com/demo/chat.html
 [ah]: http://appharbor.com
