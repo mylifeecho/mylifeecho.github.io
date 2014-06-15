@@ -12,6 +12,7 @@ I like the pattern “Fluent builder”. This pattern provides an easy and trans
 If you are the developer, who use a fluent builder at the first time, you have a better protection from the use of class in wrong way and your code will be more transparently. Also you have an easy way to investigate the interface of the builder on-the-fly (it is more convinient if you have something like IntelliSence).
 
 Look at this 
+
 ```csharp
 var doc = new SomeDocument();
 doc.Initialize(param1, param2);
@@ -32,6 +33,7 @@ doc.Save();
 ```
 
 And compare it with this:
+
 ```csharp
 DocBuilder.CreateDocument(param1, param2)
     .AddNode(node => node
@@ -47,6 +49,7 @@ In the first case you may forget about the “Initialization” or “Bind” me
 Now I’m going to describe how to implement fluent builder in C# to wrap a simple process of generation PDF document by using iTextSharp and get the code similar to that one presented above. Of course it may be more complex in your case and lead to a long invocation chain but this pattern should be used wisely as everything else.
 
 First of all we should define what we are going to do. We will create PDF document with 2 pages which should have a image and empty background and small text messages. Thereby we have to create document and page builder classes and two interfaces of page builder to define the order of page building process. We will prohibit instantiation of page builder by client code with help of internal keyword before constructor to have more control over creation process and hide the complexity of this process.
+
 ```csharp
 public class PDFBuilder : IDisposable
 {
@@ -88,6 +91,7 @@ public interface ISecondStep
 Creation of page with using [iTextSharp][itextsharp] is good example of the necessity to keep in mind order of calling methods to create page correctly. First of all we should set page size, then call NewPage method, set margins for all document to apply it for building page, and for a new page we should repeat all this actions. During creation of a page we don’t have any object of page, and this process is more procedural than object-oriented, but we hide it in our builder. 
 
 You can see implementation of AddPage method below.
+
 ```csharp
 public class PDFBuilder : IDisposable
 {
