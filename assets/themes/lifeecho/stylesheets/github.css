@@ -12,7 +12,11 @@ pre, code {
   margin: 20px 0 20px 0;
   overflow-y: hidden;
   line-height: normal;
-  font-size: 12px;
+}
+
+p > code {
+  background-color: #efefef;
+  border: 1px solid #ddd;
 }
 
 .hll { background-color: #ffffcc }
