@@ -264,3 +264,29 @@ footer span {
     line-height: 1.4em;
     color: #ababab;
 }
+
+.blog-post img { max-width: 959px; }
+
+@media only screen and (max-width: 959px) {
+    .blog-post img { max-width: 959px; }
+}
+
+/* Tablet Portrait size to standard 960 (devices and browsers) */
+@media only screen and (min-width: 768px) and (max-width: 959px) {
+    .blog-post img { max-width: 768px; }
+}
+
+/* All Mobile Sizes (devices and browser) */
+@media only screen and (max-width: 767px) {
+    .blog-post img { max-width: 767px; }
+}
+
+/* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+    .blog-post img { max-width:480px; }
+}
+
+/* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
+@media only screen and (max-width: 479px) {
+    .blog-post img { max-width: 479px; }
+}
