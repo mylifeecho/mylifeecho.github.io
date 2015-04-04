@@ -12,13 +12,15 @@ According to wiki
 
 After more then one year of experience with elasticsearch, I can say it does work very well. Elasticsearch developers made very good job not only to develop high quality search database but also to keep it out of new features which are not necessary and be focused on critical and generic functionality. At the same time they provide very good plugin system to provide the way to extend elasticsearch for you needs when basic functionality is not enough for you. You can find a lot of different plugins on Github which monitor elasticsearch cluster, collect data from different sources like Twitter, RabbitMQ, MongoDB (so called "rivers"), Forsquare [published on github][4sq] plugin for custom geo-based scoring written in Scala. 
 
-h2. Install Environment
+## Install Environment
 
-h2. Gradle to build your plugin
 
-h2. Elasticsearch Hello world
 
-h2. Release on github
+## Gradle to build your plugin
+
+## Elasticsearch Hello world
+
+## Release on github
 
 [4sq]: https://github.com/foursquare/es-scorer-plugin
 
