@@ -18,6 +18,12 @@ I will use [IntelliJ IDE][idea] Community edition. It has built in support for G
 We are going to develop elasticsearch plugin in [Scala][scala]. The reason why I didn't choose SBT is usually we have already Java project (and got lucky to have Gradle as a build tool. if not, you may consider [migration from Maven][mvn2gradle]). Your team is suttisfied to use Java for mainstream development, but new plugin is more likely will be easier to write in functional style, because you need to do a custom text analysis or processing, and functional languages are proved suitable tool for that. You are most likely don't think even to change build tool just for ~3% of you codebase. With Gradle it's very easy to build your plugin in Scala.
 So make sure you have [Scala][scala], [Gradle][gradle] and [elasticsearch][es] installed and of course Java installed. I will use Java 8.
 
+### Elasticsearch Hello world
+
+### Moving forward. Add new script language support.
+
+### Debugging elasticsearch plugin
+
 ### Building elasticsearch plugin with Gradle
 
 Elasticsearch plugin is zip file which contains jar file with main plugin class and all dependencies. Another option is just `_site` folder with website content (see [bigdesk pluging repository][bigdesk] as example). 
@@ -27,10 +33,11 @@ Basic build process is the following: compile plugin code, run tests and archive
 You can create Gradle project in IntelliJ or just create `build.gradle` file. 
 Gradle build script with annotations: 
 
-```
-apply plugin: 'scala' /* to build scala code. if you have mixed project with 
-                         scala and java, you can add second line with java 
-                         instead of scala */
+```groovy
+apply plugin: 'scala' 
+
+/* to build scala code. if you have mixed project with scala and java,
+you can add second line with java instead of scala */
 
 sourceCompatibility = 1.8
 version = '1.0'
@@ -73,12 +80,8 @@ gradle build buildPluginZip
 As the result we will have zip file ready to install to elasticsearch 
 
 ```
-bin\plugin hw-plugin --url=
+bin\plugin hw-plugin -install hw-plugin -url=file:/path_to_zip/hw-plugin.zip
 ```
-
-### Elasticsearch Hello world
-
-### Moving forward. Add new script language support.
 
 ### Release on github
 
