@@ -18,12 +18,6 @@ I will use [IntelliJ IDE][idea] Community edition. It has built in support for G
 We are going to develop elasticsearch plugin in [Scala][scala]. The reason why I didn't choose SBT is usually we have already Java project (and got lucky to have Gradle as a build tool. if not, you may consider [migration from Maven][mvn2gradle]). Your team is suttisfied to use Java for mainstream development, but new plugin is more likely will be easier to write in functional style, because you need to do a custom text analysis or processing, and functional languages are proved suitable tool for that. You are most likely don't think even to change build tool just for ~3% of you codebase. With Gradle it's very easy to build your plugin in Scala.
 So make sure you have [Scala][scala], [Gradle][gradle] and [elasticsearch][es] installed and of course Java installed. I will use Java 8.
 
-### Elasticsearch Hello world
-
-### Moving forward. Add new script language support.
-
-### Debugging elasticsearch plugin
-
 ### Building elasticsearch plugin with Gradle
 
 Elasticsearch plugin is zip file which contains jar file with main plugin class and all dependencies. Another option is just `_site` folder with website content (see [bigdesk pluging repository][bigdesk] as example). 
@@ -82,6 +76,66 @@ As the result we will have zip file ready to install to elasticsearch
 ```
 bin\plugin hw-plugin -install hw-plugin -url=file:/path_to_zip/hw-plugin.zip
 ```
+
+### Elasticsearch Hello world
+
+1. Create plugin main class extended from `AbstractPlugin`, define name and description for your plugin. Since we want to build REST endpoint we have to import `org.elasticsearch.rest._` and add method `onModule(module:RestModule):Unit`. Elasticsearch dependency injection is based on Google's DI framework [Guice][guice], it will call this method with `RestModule` instance so you can register your class which containes definition of REST action.  
+
+```scala
+package hw.elasticsearch
+
+import org.elasticsearch.plugins.AbstractPlugin
+import org.elasticsearch.rest._
+
+class HelloWorldPlugin extends AbstractPlugin {
+  override def name(): String = "hw-plugin"
+
+  override def description(): String = "Hello World plugin"
+
+  def onModule(module: RestModule): Unit = {
+    module.addRestAction(classOf[HWAction])
+  }
+}
+```
+
+2. Create `HWAction.scala` file with class which inherited from `BaseRestHandler`. Annotation `@Inject` tells DI container to inject appropriate dependencies. We will define the same arguments we have to pass to base class constructor. Scala's primary contractor which is besically body of the class looks pretty laconic and beautiful, doesn't it? 
+3. We just need to register this class as a handler. We will use `_` before the url to avoid possible conflicts with usage `hello` as index name. So the next line after class definition is `controller.registerHandler(GET, "/_hello", this)` (line 10).
+4. `HWAction` class is not going to be abstract, so we have to implement `handleRequest(RestRequest, RestChannel, Client):Unit`. Using `RestRequest` we obtain `name` query parameter, execute `answer` method and send response to `RestChannel`. `answer(String):String` method is implemented using awesome pattern matching. 
+
+```scala
+package hw.elasticsearch
+
+import org.elasticsearch.client.Client
+import org.elasticsearch.common.inject.Inject
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.rest.RestRequest.Method._
+import org.elasticsearch.rest._
+
+class HWAction @Inject() (settings: Settings, controller: RestController, client:Client) extends BaseRestHandler(settings, controller, client) {
+  controller.registerHandler(GET, "/_hello", this)
+
+  def handleRequest(request: RestRequest, channel: RestChannel, client: Client): Unit =
+    channel.sendResponse(new BytesRestResponse(RestStatus.OK, answer(request.param("name"))))
+
+  private def answer(who: String) = Option(who) match {
+    case Some("Robert") => "Your Grace!"
+    case None | Some("") => "I don't talk to strangers."
+    case _ => "Hello, " + who + "!"
+  }
+}
+```
+
+**5. The most important step** to make your plugin visible to elasticsearch is to add `es-plugin.properties` file to the resources directory with the following content:
+
+```properties
+plugin=hw.elasticsearch.HelloWorldPlugin
+```
+
+If you forget to do so, even after successful installation of the plugin, elasticsearch will ignore your plugin.
+
+### Moving forward. Add new script language support.
+
+### Debugging elasticsearch plugin
 
 ### Release on github
 
