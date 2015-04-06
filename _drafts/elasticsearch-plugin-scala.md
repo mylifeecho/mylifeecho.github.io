@@ -72,7 +72,7 @@ bin\plugin hw-plugin -install hw-plugin -url=file:/path_to_zip/hw-plugin.zip
 
 ### Elasticsearch Hello world
 
-1. Create plugin main class extended from `AbstractPlugin`, define name (line 7) and description (line 9) for your plugin. Since we want to build REST endpoint we have to import `org.elasticsearch.rest._` and add method `onModule(module:RestModule):Unit` (line 11). Elasticsearch dependency injection is based on Google's DI framework [Guice][guice], it will call this method and pass `RestModule` instance, so you can register your class which containes definition of REST action.
+* Create plugin main class extended from `AbstractPlugin`, define name (line 7) and description (line 9) for your plugin. Since we want to build REST endpoint we have to import `org.elasticsearch.rest._` and add method `onModule(module:RestModule):Unit` (line 11). Elasticsearch dependency injection is based on Google's DI framework [Guice][guice], it will call this method and pass `RestModule` instance, so you can register your class which containes definition of REST action.
 
 ```scala
 package hw.elasticsearch
@@ -91,11 +91,11 @@ class HelloWorldPlugin extends AbstractPlugin {
 }
 ```
 
-2. Create `HWAction.scala` file with class which inherited from `BaseRestHandler`. Annotation `@Inject` tells DI container to inject appropriate dependencies (line 9). We will define the same arguments we have to pass to base class constructor. Scala's primary contractor which is besically body of the class looks pretty laconic and beautiful, doesn't it? 
+* Create `HWAction.scala` file with class which inherited from `BaseRestHandler`. Annotation `@Inject` tells DI container to inject appropriate dependencies (line 9). We will define the same arguments we have to pass to base class constructor. Scala's primary contractor which is besically body of the class looks pretty laconic and beautiful, doesn't it? 
 
-3. We just need to register this class as a handler. We will use `_` before the url to avoid possible conflicts with usage `hello` as index name. So the next line after class definition is `controller.registerHandler(GET, "/_hello", this)` (line 10).
+* We just need to register this class as a handler. We will use `_` before the url to avoid possible conflicts with usage `hello` as index name. So the next line after class definition is `controller.registerHandler(GET, "/_hello", this)` (line 10).
 
-4. `HWAction` class is not going to be abstract, so we have to implement `handleRequest(RestRequest, RestChannel, Client):Unit` (line 11). Using `RestRequest` we obtain `name` query parameter, execute `answer` method and send response to `RestChannel`. `answer(String):String` method is implemented using awesome pattern matching. 
+* `HWAction` class is not going to be abstract, so we have to implement `handleRequest(RestRequest, RestChannel, Client):Unit` (line 11). Using `RestRequest` we obtain `name` query parameter, execute `answer` method and send response to `RestChannel`. `answer(String):String` method is implemented using awesome pattern matching. 
 ```scala
 package hw.elasticsearch
 
@@ -118,7 +118,7 @@ class HWAction @Inject() (settings: Settings, controller: RestController, client
   }
 }
 ```
-5. **The most important step** to make your plugin visible to elasticsearch is to add `es-plugin.properties` file to the resources directory with the following content:
+* **The most important step** to make your plugin visible to elasticsearch is to add `es-plugin.properties` file to the resources directory with the following content:
 ```properties
 plugin=hw.elasticsearch.HelloWorldPlugin
 ```
@@ -130,7 +130,30 @@ We already have elasticsearch dependency in our project with full functional ela
 
 ### Moving forward. Add new script language support.
 
+#### Convert existing code to REST module
 
+Usually we need to use more than just REST endpoint and it's better to split our plugin on modules. First module will be our rest hello world endpoint. The class of Hello World module should be inherited from `org.elasticsearch.common.inject.AbstractModule` and have overriden `configure` method
+```scala
+def override configure():Unit = bind(classOf[HelloRestHandler]).asEagerSingleton
+```
+
+#### Brainfuck script support 
+
+Second module we are going to implement will add support of another scripting language to elasticsearch and it will be [brainfuck][brainfuck]! Brainfuck interpreter [looks][brainfuck-int] quite simple in Scala, just 40 lines.
+
+TODO: Script Module
+
+#### Register modules
+
+Finally we need to register our modules. You can do this by overriding `Collection<Class<? extends Module>> modules()` java method. First of all we need to define list of modules our plugin contains. To satisfy Java interface we have to convert Scala list to Java list. When you import `scala.collection.JavaConverters` converstion will happen implicitly, but according to [Effective Scala][effective-scala] book by Twitter it's recommended to use explicit `asJava` method, aiding reader. Finaly method will look like 
+```scala
+def override modules() {
+  List(
+       classOf[HWModule],
+       classOf[BrainfuckScriptModule]
+  ).asJava
+}
+```
 
 ### Release on github
 
@@ -143,3 +166,5 @@ We already have elasticsearch dependency in our project with full functional ela
 [es]: https://www.elastic.co/downloads/elasticsearch
 [bigdesk]: https://github.com/lukas-vlcek/bigdesk
 [guice]: https://github.com/google/guice
+[effective-scala]: http://twitter.github.io/effectivescala/ 
+[brainfuck-int]: http://peter-braun.org/2012/07/brainfuck-interpreter-in-40-lines-of-scala/
