@@ -26,12 +26,10 @@ Basic build process is the following: compile plugin code, run tests and archive
 
 You can create Gradle project in IntelliJ or just create `build.gradle` file. 
 Gradle build script with annotations: 
-
 ```groovy
-apply plugin: 'scala' 
-
-/* to build scala code. if you have mixed project with scala and java,
-you can add second line with java instead of scala */
+apply plugin: 'scala' /* to build scala code. 
+    if you have mixed project with scala and java,
+    you can add second line with java instead of scala */
 
 sourceCompatibility = 1.8
 version = '1.0'
@@ -40,7 +38,6 @@ repositories {
     mavenCentral()
     mavenLocal()
 }
-
 // additional configuration to tag dependencies to be archived with plugin jar
 configurations {
     includeJars
@@ -52,7 +49,6 @@ dependencies {
     testCompile 'junit:junit:4.11'
     includeJars 'org.scala-lang:scala-library:2.11.4' // include this dependency
 }
-
 // task to archive plugin jars
 task buildPluginZip(type: Zip, dependsOn:[':jar']) {
     baseName = 'hw-plugin'
@@ -60,26 +56,24 @@ task buildPluginZip(type: Zip, dependsOn:[':jar']) {
     from files(libsDir) // include output dirictory into archive
     from { configurations.includeJars.collect { it } } // include dependencies to archive
 }
-
 // define artifacts
 artifacts {
     archives buildPluginZip
 }
 ```
-
 Run Gradle build with the following console command 
 ```
 gradle build buildPluginZip
 ```
 As the result we will have zip file ready to install to elasticsearch 
-
 ```
 bin\plugin hw-plugin -install hw-plugin -url=file:/path_to_zip/hw-plugin.zip
 ```
 
 ### Elasticsearch Hello world
 
-1. Create plugin main class extended from `AbstractPlugin`, define name and description for your plugin. Since we want to build REST endpoint we have to import `org.elasticsearch.rest._` and add method `onModule(module:RestModule):Unit`. Elasticsearch dependency injection is based on Google's DI framework [Guice][guice], it will call this method with `RestModule` instance so you can register your class which containes definition of REST action.  
+1. Create plugin main class extended from `AbstractPlugin`, define name (line 7) and description (line 9) for your plugin. Since we want to build REST endpoint we have to import `org.elasticsearch.rest._` and add method `onModule(module:RestModule):Unit` (line 11). Elasticsearch dependency injection is based on Google's DI framework [Guice][guice], it will call this method and pass `RestModule` instance, so you can register your class which containes definition of REST action.
+
 ```scala
 package hw.elasticsearch
 
@@ -96,9 +90,12 @@ class HelloWorldPlugin extends AbstractPlugin {
   }
 }
 ```
-2. Create `HWAction.scala` file with class which inherited from `BaseRestHandler`. Annotation `@Inject` tells DI container to inject appropriate dependencies. We will define the same arguments we have to pass to base class constructor. Scala's primary contractor which is besically body of the class looks pretty laconic and beautiful, doesn't it? 
+
+2. Create `HWAction.scala` file with class which inherited from `BaseRestHandler`. Annotation `@Inject` tells DI container to inject appropriate dependencies (line 9). We will define the same arguments we have to pass to base class constructor. Scala's primary contractor which is besically body of the class looks pretty laconic and beautiful, doesn't it? 
+
 3. We just need to register this class as a handler. We will use `_` before the url to avoid possible conflicts with usage `hello` as index name. So the next line after class definition is `controller.registerHandler(GET, "/_hello", this)` (line 10).
-4. `HWAction` class is not going to be abstract, so we have to implement `handleRequest(RestRequest, RestChannel, Client):Unit`. Using `RestRequest` we obtain `name` query parameter, execute `answer` method and send response to `RestChannel`. `answer(String):String` method is implemented using awesome pattern matching. 
+
+4. `HWAction` class is not going to be abstract, so we have to implement `handleRequest(RestRequest, RestChannel, Client):Unit` (line 11). Using `RestRequest` we obtain `name` query parameter, execute `answer` method and send response to `RestChannel`. `answer(String):String` method is implemented using awesome pattern matching. 
 ```scala
 package hw.elasticsearch
 
@@ -121,17 +118,19 @@ class HWAction @Inject() (settings: Settings, controller: RestController, client
   }
 }
 ```
-5. The most important step** to make your plugin visible to elasticsearch is to add `es-plugin.properties` file to the resources directory with the following content:
-
+5. **The most important step** to make your plugin visible to elasticsearch is to add `es-plugin.properties` file to the resources directory with the following content:
 ```properties
 plugin=hw.elasticsearch.HelloWorldPlugin
 ```
-
 If you forget to do so, even after successful installation of the plugin, elasticsearch will ignore your plugin.
+
+### Debugging elasticsearch plugin
+
+We already have elasticsearch dependency in our project with full functional elasticsearch node. At the matter of fact one of the options to connect to elasticsearch cluster using Java API is to start embedded node instance inside your application. Thus debugging of your plugin is very easy. You  just need to add run configuration with main class `org.elasticsearch.bootstrap.ElasticsearchF`.
 
 ### Moving forward. Add new script language support.
 
-### Debugging elasticsearch plugin
+
 
 ### Release on github
 
@@ -143,3 +142,4 @@ If you forget to do so, even after successful installation of the plugin, elasti
 [gradle]: https://gradle.org/
 [es]: https://www.elastic.co/downloads/elasticsearch
 [bigdesk]: https://github.com/lukas-vlcek/bigdesk
+[guice]: https://github.com/google/guice
