@@ -20,9 +20,7 @@ So make sure you have [Scala][scala], [Gradle][gradle] and [elasticsearch][es] i
 
 ### Building elasticsearch plugin with Gradle
 
-Elasticsearch plugin is zip file which contains jar file with main plugin class and all dependencies. Another option is just `_site` folder with website content (see [bigdesk pluging repository][bigdesk] as example). 
-
-Basic build process is the following: compile plugin code, run tests and archive with all necessary depepndencies.
+Elasticsearch plugin is zip file which contains jar file with main plugin class and all dependencies. Another option is just `_site` folder with website content (see [bigdesk pluging repository][bigdesk] as example). It makes basic build process is the following: compile plugin code, run tests and archive with all necessary depepndencies.
 
 You can create Gradle project in IntelliJ or just create `build.gradle` file. 
 Gradle build script with annotations: 
@@ -72,7 +70,7 @@ bin\plugin hw-plugin -install hw-plugin -url=file:/path_to_zip/hw-plugin.zip
 
 ### Elasticsearch Hello world
 
-* Create plugin main class extended from `AbstractPlugin`, define name (line 7) and description (line 9) for your plugin. Since we want to build REST endpoint we have to import `org.elasticsearch.rest._` and add method `onModule(module:RestModule):Unit` (line 11). Elasticsearch dependency injection is based on Google's DI framework [Guice][guice], it will call this method and pass `RestModule` instance, so you can register your class which containes definition of REST action.
+* Create plugin main class extended from `org.elasticsearch.plugins.AbstractPlugin`, define name (line 7) and description (line 9) for your plugin. Since we want to build REST endpoint we have to import `org.elasticsearch.rest._` and add method `onModule(module:RestModule):Unit` (line 11). Elasticsearch dependency injection is based on Google's DI framework [Guice][guice], it will call this method and pass `RestModule` instance, so you can register your class which containes definition of REST action.
 
 ```scala
 package hw.elasticsearch
