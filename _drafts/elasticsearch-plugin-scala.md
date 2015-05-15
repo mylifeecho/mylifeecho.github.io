@@ -10,7 +10,7 @@ tags: [ Scala, elasticsearch, Gradle ]
 According to wiki
 > Elasticsearch is a search server based on Lucene. It provides a distributed, multitenant-capable full-text search engine with a RESTful web interface and schema-free JSON documents.
 
-After more then one year of experience with elasticsearch, I can say it does work very well. Elasticsearch developers made very good job not only to develop high quality search database but also to keep it out of new features which are not necessary and be focused on critical and generic functionality. At the same time they provide very good plugin system to provide the way to extend elasticsearch for you needs when basic functionality is not enough for you. You can find a lot of different plugins on Github which monitor elasticsearch cluster, collect data from different sources like Twitter, RabbitMQ, MongoDB (so called "rivers"), Forsquare [published on github][4sq] plugin for custom geo-based scoring (written in Scala by the way) and many more. 
+After more then one year of extensive experience with elasticsearch, I can say it does work very well. Elasticsearch developers made very good job not only to develop high quality search database but also to keep it out of new features which are not necessary and be focused on critical and generic functionality. At the same time they provide very good plugin system to extend elasticsearch for you needs when basic functionality is not enough for you. You can find a lot of different plugins on Github which monitor elasticsearch cluster, collect data from different sources like Twitter, RabbitMQ, MongoDB (so called "rivers"), Forsquare [published on github][4sq] plugin for custom geo-based scoring (written in Scala by the way) and many more. I'm going to describe how to build simple hello world plugin in Scala using Gradle, release it on Github and start to use it.
 
 ### Install Environment
 
@@ -124,31 +124,22 @@ If you forget to do so, even after successful installation of the plugin, elasti
 
 ### Debugging elasticsearch plugin
 
-We already have elasticsearch dependency in our project with full functional elasticsearch node. At the matter of fact one of the options to connect to elasticsearch cluster using Java API is to start embedded node instance inside your application. Thus debugging of your plugin is very easy. You  just need to add run configuration with main class `org.elasticsearch.bootstrap.ElasticsearchF`.
+We already have elasticsearch dependency in our project with full functional elasticsearch node. At the matter of fact one of the options to connect to elasticsearch cluster using Java API is to start embedded node instance inside your application. Thus debugging of your plugin is very easy. You just need to add run configuration with main class `org.elasticsearch.bootstrap.ElasticsearchF`. You can use VM options to change elasticsearch configuration. Any option in `elasticsearch.yml` file can be used with `es.` prefix. So for instance if you want to change cluster name to debug your plugin, add `-Des.cluster.name=my-cluster` to VM options.
 
-### Moving forward. Add new script language support.
+#### Define modules as alternative solution (optional)
 
-#### Convert existing code to REST module
-
-Usually we need to use more than just REST endpoint and it's better to split our plugin on modules. First module will be our rest hello world endpoint. The class of Hello World module should be inherited from `org.elasticsearch.common.inject.AbstractModule` and have overriden `configure` method
+Usually plugin is something more than just REST endpoint and it's better to split our plugin on modules. First module can be our rest hello world endpoint. The Hello World module class should be inherited from `org.elasticsearch.common.inject.AbstractModule` and have overriden `configure` method to register handler
 ```scala
 def override configure():Unit = bind(classOf[HelloRestHandler]).asEagerSingleton
 ```
 
-#### Brainfuck script support 
-
-Second module we are going to implement will add support of another scripting language to elasticsearch and it will be [brainfuck][brainfuck]! Brainfuck interpreter [looks][brainfuck-int] quite simple in Scala, just 40 lines.
-
-TODO: Script Module
-
-#### Register modules
-
-Finally we need to register our modules. You can do this by overriding `Collection<Class<? extends Module>> modules()` java method. First of all we need to define list of modules our plugin contains. To satisfy Java interface we have to convert Scala list to Java list. When you import `scala.collection.JavaConverters` converstion will happen implicitly, but according to [Effective Scala][effective-scala] book by Twitter it's recommended to use explicit `asJava` method, aiding reader. Finaly method will look like 
+You can register your modules by overriding `Collection<Class<? extends Module>> modules()` java method of the plugin class. 
+First of all we need to define list of modules our plugin contains. We have to convert Scala list to Java list to satisfy Java interface. When you import `scala.collection.JavaConverters` converstion will happen implicitly, but according to [Effective Scala][effective-scala] book by Twitter it's recommended to use explicit `asJava` method, aiding reader. Finaly method will look like:
 ```scala
 def override modules() {
   List(
        classOf[HWModule],
-       classOf[BrainfuckScriptModule]
+       classOf[AnotherModule]
   ).asJava
 }
 ```
