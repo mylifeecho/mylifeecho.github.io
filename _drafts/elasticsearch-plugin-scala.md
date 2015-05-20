@@ -126,7 +126,7 @@ If you forget to do so, even after successful installation of the plugin, elasti
 
 We already have elasticsearch dependency in our project with full functional elasticsearch node. At the matter of fact one of the options to connect to elasticsearch cluster using Java API is to start embedded node instance inside your application. Thus debugging of your plugin is very easy. You just need to add run configuration with main class `org.elasticsearch.bootstrap.ElasticsearchF`. You can use VM options to change elasticsearch configuration. Any option in `elasticsearch.yml` file can be used with `es.` prefix. So for instance if you want to change cluster name to debug your plugin, add `-Des.cluster.name=my-cluster` to VM options.
 
-#### Define modules as alternative solution (optional)
+#### Define modules as alternative solution
 
 Usually plugin is something more than just REST endpoint and it's better to split our plugin on modules. First module can be our rest hello world endpoint. The Hello World module class should be inherited from `org.elasticsearch.common.inject.AbstractModule` and have overriden `configure` method to register handler
 ```scala
@@ -146,6 +146,8 @@ def override modules() {
 
 ### Release on github
 
+Next step will be release our plugin on github to be able to install plugin using standard elasticsearch commnand. This command will look like `./bin/plugin --install mylifeecho/elasticsearch-hw-plugin/0.0.1`. Version number of course should be according [Semantic Versioning][semver], but keep in mind that your plugin builded for elasticsearch 1.3.x may not work on elasticsearch 1.4.x. In my case I had issue due to changes in interface of `BaseRestHandler` contructor. So you probably would like to have plugin version per elasticsearch version like [these guys][aws-plugin] do.
+
 [4sq]: https://github.com/foursquare/es-scorer-plugin
 [idea]: https://www.jetbrains.com/idea/
 [why-gradle]: https://google.com/?q=why+gradle
@@ -156,4 +158,5 @@ def override modules() {
 [bigdesk]: https://github.com/lukas-vlcek/bigdesk
 [guice]: https://github.com/google/guice
 [effective-scala]: http://twitter.github.io/effectivescala/ 
-[brainfuck-int]: http://peter-braun.org/2012/07/brainfuck-interpreter-in-40-lines-of-scala/
+[semver]: http://semver.org/
+[aws-plugin]: https://github.com/elastic/elasticsearch-cloud-aws
