@@ -146,7 +146,12 @@ def override modules() {
 
 ### Release on github
 
-Next step will be release our plugin on github to be able to install plugin using standard elasticsearch commnand. This command will look like `./bin/plugin --install mylifeecho/elasticsearch-hw-plugin/0.0.1`. Version number of course should be according [Semantic Versioning][semver], but keep in mind that your plugin builded for elasticsearch 1.3.x may not work on elasticsearch 1.4.x. In my case I had issue due to changes in interface of `BaseRestHandler` contructor. So you probably would like to have plugin version per elasticsearch version like [these guys][aws-plugin] do.
+Next step will be release our plugin on github to be able to install plugin using standard elasticsearch commnand. This command will look like `./bin/plugin --install mylifeecho/elasticsearch-hw-plugin/0.0.1`. Version number of course should be according [Semantic Versioning][semver], but keep in mind that your plugin builded for elasticsearch 1.3.x may not work on elasticsearch 1.4.x. In my case I had issue due to changes in interface of `BaseRestHandler` contructor. So you probably would like to have plugin version per elasticsearch version like [these guys][aws-plugin] do. 
+When you run `./bin/plugin --install` command elasticsearch will try to access `download.elastic.co` first and than maven central in order to download your plugin. 
+Follow [OSSRH Guide][ossrh] to deploy plugin and take a look at [OSSRH Gradle][ossrh-gradle].
+
+You can find the source code of hello world plugin on [Guthub][hw-src].
+Next I'm going to show how to add support of new script language into elasticsearch.
 
 [4sq]: https://github.com/foursquare/es-scorer-plugin
 [idea]: https://www.jetbrains.com/idea/
@@ -160,3 +165,6 @@ Next step will be release our plugin on github to be able to install plugin usin
 [effective-scala]: http://twitter.github.io/effectivescala/ 
 [semver]: http://semver.org/
 [aws-plugin]: https://github.com/elastic/elasticsearch-cloud-aws
+[ossrh]: http://central.sonatype.org/pages/ossrh-guide.html
+[ossrh-gradle]: http://central.sonatype.org/pages/gradle.html
+[hw-src]: TODO
