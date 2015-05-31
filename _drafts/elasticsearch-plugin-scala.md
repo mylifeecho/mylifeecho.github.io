@@ -158,11 +158,11 @@ Follow [OSSRH Guide][ossrh] to deploy plugin and take a look at [OSSRH Gradle][o
 
 Restart elasticsearch after installation. Output will be similar to
 ```
-[2015-05-31 21:34:56,276][INFO ][node                     ] [Hector] version[1.5.2], pid[8572], build[62ff986/2015-04-27T09:21:06Z]
-[2015-05-31 21:34:56,277][INFO ][node                     ] [Hector] initializing ...
-[2015-05-31 21:34:56,296][INFO ][plugins                  ] [Hector] loaded [hello-plugin], sites []
-[2015-05-31 21:34:59,593][INFO ][node                     ] [Hector] initialized
-[2015-05-31 21:34:59,740][INFO ][node                     ] [Hector] starting ...
+[2015-05-31 21:34:56,276][INFO ][node                     ] [Varys] version[1.5.2], pid[8572], build[62ff986/2015-04-27T09:21:06Z]
+[2015-05-31 21:34:56,277][INFO ][node                     ] [Varys] initializing ...
+[2015-05-31 21:34:56,296][INFO ][plugins                  ] [Varys] loaded [hello-plugin], sites []
+[2015-05-31 21:34:59,593][INFO ][node                     ] [Varys] initialized
+[2015-05-31 21:34:59,740][INFO ][node                     ] [Varys] starting ...
 ```
 
 You can find the source code of hello plugin on [Guthub][hello-src].
@@ -182,4 +182,4 @@ In my next blog post I'm going to show how to add support of new script language
 [aws-plugin]: https://github.com/elastic/elasticsearch-cloud-aws
 [ossrh]: http://central.sonatype.org/pages/ossrh-guide.html
 [ossrh-gradle]: http://central.sonatype.org/pages/gradle.html
-[hello-src]: TODO
+[hello-src]: https://github.com/mylifeecho/hello-plugin
