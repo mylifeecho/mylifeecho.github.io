@@ -65,7 +65,7 @@ gradle build buildPluginZip
 ```
 As the result we will have zip file ready to install to elasticsearch 
 ```
-bin\plugin hello-plugin -install hello-plugin -url=file:/path_to_zip/hello-plugin.zip
+bin\plugin --install hello-plugin --url=file://path_to_zip/hello-plugin.zip
 ```
 
 ### Elasticsearch Hello plugin
@@ -93,12 +93,13 @@ class HelloPlugin extends AbstractPlugin {
 
 * We just need to register this class as a handler. We will use `_` before the url to avoid possible conflicts with usage `hello` as index name. So the next line after class definition is `controller.registerHandler(GET, "/_hello", this)` (line 10).
 
-* `HWAction` class is not going to be abstract, so we have to implement `handleRequest(RestRequest, RestChannel, Client):Unit` (line 11). Using `RestRequest` we obtain `name` query parameter, execute `answer` method and send response to `RestChannel`. `answer(String):String` method is implemented using awesome pattern matching. 
+* `HelloAction` class is not going to be abstract, so we have to implement `handleRequest(RestRequest, RestChannel, Client):Unit` (line 11). Using `RestRequest` we obtain `name` query parameter, execute `answer` method and send response to `RestChannel`. `answer(String):String` method is implemented using awesome pattern matching. 
 ```scala
 package hello.elasticsearch
 /* all imports */
 class HelloAction @Inject() (settings: Settings, controller: RestController, client:Client) 
     extends BaseRestHandler(settings, controller, client) {
+    
   controller.registerHandler(GET, "/_hello", this)
 
   def handleRequest(request: RestRequest, channel: RestChannel, client: Client): Unit =
@@ -154,6 +155,15 @@ def override modules() {
 Next step will be release our plugin to be able to install plugin using standard elasticsearch commnand. This command will look like `./bin/plugin --install mylifeecho/hello-plugin/0.0.1`. Version number of course should be according [Semantic Versioning][semver], but keep in mind that your plugin builded for elasticsearch 1.3.x may not work on elasticsearch 1.4.x. In my case I had issue due to changes in interface of `BaseRestHandler` contructor between 1.3 and 1.4 versions. So you probably would like to have plugin version per minor elasticsearch version like [these guys][aws-plugin] do. 
 When you run `./bin/plugin --install` command elasticsearch will try to access `download.elastic.co` first and than maven central in order to download your plugin. 
 Follow [OSSRH Guide][ossrh] to deploy plugin and take a look at [OSSRH Gradle][ossrh-gradle]. After that you can install your plugin.
+
+Restart elasticsearch after installation. Output will be similar to
+```
+[2015-05-31 21:34:56,276][INFO ][node                     ] [Hector] version[1.5.2], pid[8572], build[62ff986/2015-04-27T09:21:06Z]
+[2015-05-31 21:34:56,277][INFO ][node                     ] [Hector] initializing ...
+[2015-05-31 21:34:56,296][INFO ][plugins                  ] [Hector] loaded [hello-plugin], sites []
+[2015-05-31 21:34:59,593][INFO ][node                     ] [Hector] initialized
+[2015-05-31 21:34:59,740][INFO ][node                     ] [Hector] starting ...
+```
 
 You can find the source code of hello plugin on [Guthub][hello-src].
 In my next blog post I'm going to show how to add support of new script language into elasticsearch.
