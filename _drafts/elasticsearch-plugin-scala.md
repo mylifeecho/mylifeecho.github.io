@@ -73,7 +73,7 @@ bin\plugin hello-plugin -install hello-plugin -url=file:/path_to_zip/hello-plugi
 * Create plugin main class extended from `org.elasticsearch.plugins.AbstractPlugin`, define name (line 7) and description (line 9) for your plugin. Since we want to build REST endpoint we have to import `org.elasticsearch.rest._` and add method `onModule(module:RestModule):Unit` (line 11). Elasticsearch dependency injection is based on Google's DI framework [Guice][guice], it will call this method and pass `RestModule` instance, so you can register your class which containes definition of REST action.
 
 ```scala
-package hw.elasticsearch
+package hello.elasticsearch
 
 import org.elasticsearch.plugins.AbstractPlugin
 import org.elasticsearch.rest._
@@ -95,7 +95,7 @@ class HelloPlugin extends AbstractPlugin {
 
 * `HWAction` class is not going to be abstract, so we have to implement `handleRequest(RestRequest, RestChannel, Client):Unit` (line 11). Using `RestRequest` we obtain `name` query parameter, execute `answer` method and send response to `RestChannel`. `answer(String):String` method is implemented using awesome pattern matching. 
 ```scala
-package hw.elasticsearch
+package hello.elasticsearch
 /* all imports */
 class HelloAction @Inject() (settings: Settings, controller: RestController, client:Client) 
     extends BaseRestHandler(settings, controller, client) {
@@ -113,7 +113,7 @@ class HelloAction @Inject() (settings: Settings, controller: RestController, cli
 ```
 * **The most important step** to make your plugin visible to elasticsearch is to add `es-plugin.properties` file to the resources directory with the following content:
 ```properties
-plugin=hw.elasticsearch.HelloPlugin
+plugin=hello.elasticsearch.HelloPlugin
 ```
 If you forget to do so, even after successful installation of the plugin, elasticsearch will ignore your plugin and you may waste your time trying to figure out what's wrong with your code.
 
@@ -143,7 +143,7 @@ First of all we need to define list of modules our plugin contains. We have to c
 ```scala
 def override modules() {
   List(
-       classOf[HWModule],
+       classOf[HelloModule],
        classOf[UselessModule]
   ).asJava
 }
@@ -151,7 +151,7 @@ def override modules() {
 
 ### Release!
 
-Next step will be release our plugin to be able to install plugin using standard elasticsearch commnand. This command will look like `./bin/plugin --install mylifeecho/elasticsearch-hello-plugin/0.0.1`. Version number of course should be according [Semantic Versioning][semver], but keep in mind that your plugin builded for elasticsearch 1.3.x may not work on elasticsearch 1.4.x. In my case I had issue due to changes in interface of `BaseRestHandler` contructor between 1.3 and 1.4 versions. So you probably would like to have plugin version per minor elasticsearch version like [these guys][aws-plugin] do. 
+Next step will be release our plugin to be able to install plugin using standard elasticsearch commnand. This command will look like `./bin/plugin --install mylifeecho/hello-plugin/0.0.1`. Version number of course should be according [Semantic Versioning][semver], but keep in mind that your plugin builded for elasticsearch 1.3.x may not work on elasticsearch 1.4.x. In my case I had issue due to changes in interface of `BaseRestHandler` contructor between 1.3 and 1.4 versions. So you probably would like to have plugin version per minor elasticsearch version like [these guys][aws-plugin] do. 
 When you run `./bin/plugin --install` command elasticsearch will try to access `download.elastic.co` first and than maven central in order to download your plugin. 
 Follow [OSSRH Guide][ossrh] to deploy plugin and take a look at [OSSRH Gradle][ossrh-gradle]. After that you can install your plugin.
 
@@ -172,4 +172,4 @@ In my next blog post I'm going to show how to add support of new script language
 [aws-plugin]: https://github.com/elastic/elasticsearch-cloud-aws
 [ossrh]: http://central.sonatype.org/pages/ossrh-guide.html
 [ossrh-gradle]: http://central.sonatype.org/pages/gradle.html
-[hw-src]: TODO
+[hello-src]: TODO
