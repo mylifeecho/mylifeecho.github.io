@@ -165,7 +165,8 @@ Restart elasticsearch after installation. Output will be similar to
 [2015-05-31 21:34:59,740][INFO ][node                     ] [Varys] starting ...
 ```
 
-You can find the source code of hello plugin on [Guthub][hello-src].
+You can find the source code of hello plugin on [Guthub][hello-src] or install plugin with the command `bin\plugin --install hello-plugin --url https://github.com/mylifeecho/hello-plugin/releases/download/0.0.1/hello-plugin-0.0.1.zip`.
+
 In my next blog post I'm going to show how to add support of new script language into elasticsearch.
 
 [4sq]: https://github.com/foursquare/es-scorer-plugin
