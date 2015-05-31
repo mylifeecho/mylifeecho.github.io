@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>mylifeecho - ASP.NET WebAPI ViewModel</title>
+    <meta name="description" content="It is quite often objects, which are aimed to transfer a data between a client and a server or to represent the objects of the real world, are different from data-access layer or buisness logic objects. In this case it is recommended to use DTO. Concerning ASP.NET WebAPI that designed by MVC pattern DTO can be used as a view model in client/server interaction. There are recommendations for ASP.NET MVC to use View Model object to transfer information to View instead of Entity Framework enities for example, and for WebAPI it is more actual. For convertion Model to View Model and back it is very convenient to use AutoMapper.">
+    <meta name="author" content="Alexey Rodiontsev">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/base.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/skeleton.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/layout.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/theme.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/github.css">
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Favicons
+    ================================================== -->
+    <link rel="shortcut icon" href="/assets/themes/lifeecho/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/assets/themes/lifeecho/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/themes/lifeecho/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/assets/themes/lifeecho/images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+      <div id="header" class="sixteen columns">
+          <div id="header-container" class="container">
+              <div id="branding" class="five columns">
+                  <h1><a href="/">mylifeecho</a></h1>
+                  <h5>Alexey Rodiontsev's personal blog</h5>
+              </div>
+              <div id="layout-navigation">
+                  <nav>
+                    <ul class="menu menu-main-menu">
+                      <li class="first"><a href="/">Blog</a></li>
+                      <li><a href="/notes-tips-tricks">Notes, Tips and Tricks</a></li>
+                      <li class="last"><a href="/about">About</a></li>
+                    </ul>
+                  </nav>
+              </div>
+          </div>
+      </div>
+      <div id="main" class="container">
+        <div class="content eleven columns">
+          
+<article class="content-item blog-post">
+  <header>
+    <h1>ASP.NET WebAPI ViewModel </h1>
+    
+    <div class="tags">Tags:
+      <ul class="tag_box inline">
+        
+        
+
+
+  
+     
+    	<li><a href="#DTO-ref">DTO <span>1</span></a></li>
+     
+    	<li><a href="#ASP.NET WebAPI-ref">ASP.NET WebAPI <span>2</span></a></li>
+     
+    	<li><a href="#AutoMapper-ref">AutoMapper <span>1</span></a></li>
+    
+  
+
+
+
+      </ul>
+    </div>
+    
+    <div class="metadata">
+      <div class="published">23 Aug 2012</div>
+    </div>
+  </header>
+
+  <p>It is quite often objects, which are aimed to transfer a data between a client and a server or to represent the objects of the real world, are different from data-access layer or buisness logic objects. In this case it is recommended to use <a href="http://martinfowler.com/eaaCatalog/dataTransferObject.html">DTO</a>. Concerning ASP.NET WebAPI that designed by MVC pattern DTO can be used as a view model in client/server interaction. There are recommendations for ASP.NET MVC to use View Model object to transfer information to View instead of Entity Framework enities for example, and for WebAPI it is more actual. For convertion Model to View Model and back it is very convenient to use <a href="http://automapper.codeplex.com/">AutoMapper</a>. NuGet easily allows to add this library to the project (type into your Package manager console: <code>Install-Package AutoMapper</code>).</p>
+
+<p>To use AutoMapper it is necessery to configure how the objects of one type will be mapped to once of another type. If we use model and DTO object that have the same names of properties, the configuration will take ony one line of code. If we have a more complex object that requires more complex convertion, we can use a fluent-like configuration or inheritance from <code>TypeConverter&lt;srcT, destT&gt;</code> and realization of its abstract method <code>destT ConvertCore(srcT source)</code>. Here is the example:</p>
+<div class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="n">Mapper</span><span class="p">.</span><span class="n">CreateMap</span><span class="p">&lt;</span><span class="n">SimpleModel</span><span class="p">,</span> <span class="n">SimpleViewModel</span><span class="p">&gt;();</span>
+
+<span class="n">Mapper</span><span class="p">.</span><span class="n">CreateMap</span><span class="p">&lt;</span><span class="n">Model</span><span class="p">,</span> <span class="n">ViewModel</span><span class="p">&gt;()</span>
+        <span class="p">.</span><span class="n">ConvertUsing</span><span class="p">&lt;</span><span class="n">ModelToViewModelConverter</span><span class="p">&gt;();</span>
+</code></pre></div>
+<p>And realization of converter:</p>
+<div class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="k">public</span> <span class="k">class</span> <span class="nc">ModelToViewModelConverter</span> 
+    <span class="p">:</span> <span class="n">TypeConverter</span><span class="p">&lt;</span><span class="n">Model</span><span class="p">,</span> <span class="n">ViewModel</span><span class="p">&gt;</span> <span class="p">{</span>
+
+    <span class="k">protected</span> <span class="k">override</span> <span class="n">ViewModel</span> <span class="nf">ConvertCore</span><span class="p">(</span><span class="n">Model</span> <span class="n">source</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="n">var</span> <span class="n">destination</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ViewModel</span> <span class="p">{</span>
+            <span class="n">Name</span> <span class="p">=</span> <span class="n">source</span><span class="p">.</span><span class="n">Name</span><span class="p">,</span>
+            <span class="n">Total</span> <span class="p">=</span> <span class="n">source</span><span class="p">.</span><span class="n">Balance</span> <span class="p">+</span> <span class="n">source</span><span class="p">.</span><span class="n">Incomes</span><span class="p">.</span><span class="nf">Sum</span><span class="p">(</span><span class="n">x</span> <span class="p">=&gt;</span> <span class="n">x</span><span class="p">.</span><span class="n">Value</span><span class="p">)</span>
+        <span class="p">};</span>
+        <span class="n">destination</span><span class="p">.</span><span class="nf">Initialize</span><span class="p">();</span>
+
+        <span class="k">return</span> <span class="n">output</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The mapping from model to view model in ApiController&#39;s method might be implemented directly in the body of method by the invocation of generic-function Map or creating our own ActionFilterAttribute for methods of ApiController. And this action filter will perform mapping of objects. I&#39;m going to show the second way and present the code of controller&#39;s method below as result.</p>
+<div class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="na">[AutoMap(typeof(ViewModel))]</span>                         
+<span class="k">public</span> <span class="n">Model</span> <span class="nf">Get</span><span class="p">(</span><span class="n">Guid</span> <span class="n">id</span><span class="p">)</span> <span class="p">{</span>                           
+    <span class="n">var</span> <span class="n">model</span> <span class="p">=</span> <span class="n">_modelRepository</span><span class="p">.</span><span class="nf">GetById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>        
+    <span class="k">if</span> <span class="p">(</span><span class="n">model</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span>                               
+        <span class="k">return</span> <span class="nf">GetException</span><span class="p">(</span><span class="n">HttpStatusCode</span><span class="p">.</span><span class="n">NotFound</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">model</span><span class="p">;</span>                                    
+<span class="p">}</span>
+</code></pre></div>
+<p>To create our own ActionFilterAttribute, we need to inherit from <code>ActionFilterAttribute</code> from <strong>System.Web.Http.Filters</strong> namespace (but not System.Web.Mvc.Filters) and override method <strong>OnActionExecuted</strong> as it shown below. </p>
+<div class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="na">[AttributeUsage(AttributeTargets.Method)]</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">AutoMapAttribute</span> <span class="p">:</span> <span class="n">ActionFilterAttribute</span> <span class="p">{</span>
+    <span class="c1">/// &lt;summary&gt;
+</span>    <span class="c1">/// Action filter converts model to view model using AutoMapper. 
+</span>    <span class="c1">/// &lt;/summary&gt;
+</span>    <span class="k">public</span> <span class="nf">AutoMapAttribute</span><span class="p">(</span><span class="n">Type</span> <span class="n">convertTo</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">ConvertTo</span> <span class="p">=</span> <span class="n">convertTo</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">/// &lt;summary&gt;
+</span>    <span class="c1">/// Type of view model.
+</span>    <span class="c1">/// &lt;/summary&gt;
+</span>    <span class="k">public</span> <span class="n">Type</span> <span class="n">ConvertTo</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnActionExecuted</span><span class="p">(</span><span class="n">HttpActionExecutedContext</span> <span class="n">actionContext</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">HttpStatusCode</span> <span class="n">status</span> <span class="p">=</span> <span class="n">actionContext</span><span class="p">.</span><span class="n">Response</span><span class="p">.</span><span class="n">StatusCode</span><span class="p">;</span>
+        <span class="c1">// check that result of action is positive
+</span>        <span class="kt">bool</span> <span class="n">isNegativeResponse</span> <span class="p">=</span>
+               <span class="n">status</span> <span class="p">!=</span> <span class="n">HttpStatusCode</span><span class="p">.</span><span class="n">Created</span>
+            <span class="p">&amp;&amp;</span> <span class="n">status</span> <span class="p">!=</span> <span class="n">HttpStatusCode</span><span class="p">.</span><span class="n">OK</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">isNegativeResponse</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="c1">// get model from response message
+</span>        <span class="kt">object</span> <span class="n">model</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(!</span><span class="n">actionContext</span><span class="p">.</span><span class="n">Response</span><span class="p">.</span><span class="nf">TryGetContentValue</span><span class="p">(</span><span class="k">out</span> <span class="n">model</span><span class="p">))</span> <span class="p">{</span>
+            <span class="n">actionContext</span><span class="p">.</span><span class="n">Response</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">HttpResponseMessage</span><span class="p">(</span><span class="n">HttpStatusCode</span><span class="p">.</span><span class="n">InternalServerError</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="c1">// convert model to view model and set new response to action context
+</span>        <span class="n">var</span> <span class="n">viewModel</span> <span class="p">=</span> <span class="n">Mapper</span><span class="p">.</span><span class="nf">Map</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model</span><span class="p">.</span><span class="nf">GetType</span><span class="p">(),</span> <span class="n">ConvertTo</span><span class="p">);</span>
+        <span class="n">actionContext</span><span class="p">.</span><span class="n">Response</span> <span class="p">=</span> <span class="n">actionContext</span><span class="p">.</span><span class="n">Request</span><span class="p">.</span><span class="nf">CreateResponse</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">viewModel</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Let&#39;s pay attention to the method OnActionExecuted. First of all, we should check the status of server response. If it is positive we try to get model from the response and if we have got success we are going to use AutoMapper to transfom it into ViewModel. Here we use other overriding of the method Map instead of generic-method. Also we have to pass the type of mapped object second by the second argument for correct detection of model type. It is necessary because we got the object of model from the context of Entity Framwork, and AutoMapper detects its type as type of proxy-object and does not find suitable mapping.</p>
+
+<p>That&#39;s all.</p>
+
+
+  
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'mylifeecho'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+</article>
+
+        </div>
+        <div class="sidebar five columns">
+          <article class="widget">
+    <header>
+        <h3>About me</h3>
+    </header>
+    <p>My name is Alexey Rodiontsev. I&rsquo;m a software engineer at Irdeto B.V., Amsterdam, The Netherlands.</p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Connect</h3> 
+    </header>
+    <p>
+      <a href="https://twitter.com/klappvisor" title="twitter">
+        <img src="/assets/sidebar/c-icon-twi.png" alt="" width="64" height="64" />
+      </a>
+      <a href="https://github.com/klappvisor" title="GitHub">
+        <img src="/assets/sidebar/c-icon-git.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://www.linkedin.com/in/alexeyrodiontsev" title="Linked In">
+        <img src="/assets/sidebar/c-icon-in.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://feeds.feedburner.com/mylifeecho" title="RSS">
+        <img src="/assets/sidebar/c-icon-rss.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://stackoverflow.com/users/793874/" title="stackoverflow">
+        <img src="/assets/sidebar/icon-stacko.png" alt="" width="64" height="64" />
+      </a>
+      <a href="https://github.com/mylifeecho" title="examples">
+        <img src="/assets/sidebar/c-icon-git.png" alt="" style="margin-left: 5px; margin-bottom: 3px;" width="32" height="32" />
+      </a>
+    </p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Recommended Reading</h3>
+    </header>
+    <ul style="padding-left: 0;">
+      <li><a href="/books#code-complete">Code Complete</a></li>
+      <li><a href="/books#design-patterns">Design patterns : elements of reusable object-oriented software</a></li>
+      <li><a href="/books#csharp-in-a-nutshell">C# in a Nutshell</a></li>
+      <li><a href="/books#31days-of-refactoring">31 days of refactoring</a></li>
+    </ul>
+    <p></p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Others</h3>
+    </header>
+    <p>
+      <a href="/certifications">
+        <img src="/assets/sidebar/MCSD(rgb)_1477.png" alt="MCSD: Web Applications" style="float: initial;" width="217" height="63" />
+      </a>
+    </p>
+    <p></p>
+</article>
+        </div>
+      </div>
+      
+      <div id="footer-wrapper">
+          <footer class="container">
+              <p>&copy; 2015 Alexey Rodiontsev
+                with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+              </p>
+          </footer>
+      </div>
+
+    
+  </body>
+</html>

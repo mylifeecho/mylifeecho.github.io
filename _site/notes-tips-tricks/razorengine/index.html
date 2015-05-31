@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>mylifeecho - RazorEngine</title>
+    <meta name="description" content="You can use .cshtml templates to create text content, for example for massive email sending slightly different for each user. There are at least two ways to do it.">
+    <meta name="author" content="Alexey Rodiontsev">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/base.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/skeleton.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/layout.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/theme.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/github.css">
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Favicons
+    ================================================== -->
+    <link rel="shortcut icon" href="/assets/themes/lifeecho/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/assets/themes/lifeecho/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/themes/lifeecho/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/assets/themes/lifeecho/images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+      <div id="header" class="sixteen columns">
+          <div id="header-container" class="container">
+              <div id="branding" class="five columns">
+                  <h1><a href="/">mylifeecho</a></h1>
+                  <h5>Alexey Rodiontsev's personal blog</h5>
+              </div>
+              <div id="layout-navigation">
+                  <nav>
+                    <ul class="menu menu-main-menu">
+                      <li class="first"><a href="/">Blog</a></li>
+                      <li><a href="/notes-tips-tricks">Notes, Tips and Tricks</a></li>
+                      <li class="last"><a href="/about">About</a></li>
+                    </ul>
+                  </nav>
+              </div>
+          </div>
+      </div>
+      <div id="main" class="container">
+        <div class="content eleven columns">
+          
+<article class="content-item blog-post">
+  <header>
+    <h1>RazorEngine </h1>
+    
+    <div class="tags">Tags:
+      <ul class="tag_box inline">
+        
+        
+
+
+  
+     
+    	<li><a href="#ASP.NET MVC-ref">ASP.NET MVC <span>2</span></a></li>
+     
+    	<li><a href="#Razor-ref">Razor <span>2</span></a></li>
+    
+  
+
+
+
+      </ul>
+    </div>
+    
+    <div class="metadata">
+      <div class="published">22 Sep 2012</div>
+    </div>
+  </header>
+
+  <p>You can use <em>.cshtml</em> templates to create text content, for example for massive email sending slightly different for each user. There are at least two ways to do it.</p>
+
+<ol>
+<li>You can make it something like this:</li>
+</ol>
+<div class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">RenderPartialViewToString</span><span class="p">(</span><span class="n">Controller</span> <span class="n">controller</span><span class="p">,</span> <span class="kt">string</span> <span class="n">viewName</span><span class="p">,</span> <span class="kt">object</span> <span class="n">model</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">controller</span><span class="p">.</span><span class="n">ViewData</span><span class="p">.</span><span class="n">Model</span> <span class="p">=</span> <span class="n">model</span><span class="p">;</span>
+    <span class="k">using</span> <span class="p">(</span><span class="n">StringWriter</span> <span class="n">sw</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">StringWriter</span><span class="p">())</span> <span class="p">{</span>
+        <span class="n">var</span> <span class="n">viewResult</span> <span class="p">=</span> <span class="n">ViewEngines</span><span class="p">.</span><span class="n">Engines</span><span class="p">.</span><span class="nf">FindPartialView</span><span class="p">(</span><span class="n">controller</span><span class="p">.</span><span class="n">ControllerContext</span><span class="p">,</span> <span class="n">viewName</span><span class="p">);</span>
+        <span class="n">var</span> <span class="n">viewContext</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">ViewContext</span><span class="p">(</span><span class="n">controller</span><span class="p">.</span><span class="n">ControllerContext</span><span class="p">,</span>
+                                          <span class="n">viewResult</span><span class="p">.</span><span class="n">View</span><span class="p">,</span>
+                                          <span class="n">controller</span><span class="p">.</span><span class="n">ViewData</span><span class="p">,</span>
+                                          <span class="n">controller</span><span class="p">.</span><span class="n">TempData</span><span class="p">,</span>
+                                          <span class="n">sw</span><span class="p">);</span>
+       <span class="n">viewResult</span><span class="p">.</span><span class="n">View</span><span class="p">.</span><span class="nf">Render</span><span class="p">(</span><span class="n">viewContext</span><span class="p">,</span> <span class="n">sw</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="n">sw</span><span class="p">.</span><span class="nf">GetStringBuilder</span><span class="p">().</span><span class="nf">ToString</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>But we need a controller context in this case. And as an advantage of this method is correct work of all Html and Url helpers in template. Of course, if we use context of real controller but not dummy.</p>
+
+<ol>
+<li>Also we can use <a href="http://razorengine.codeplex.com/">RazorEngine</a>, but without using helpers. If you are going to use them, you should know that there is a tricky way to interact with helpers(<a href="https://github.com/Antaris/RazorEngine/issues/29">link</a>).</li>
+</ol>
+<div class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="kt">string</span> <span class="n">template</span> <span class="p">=</span> <span class="s">"Hello @Model.Name! Welcome to Razor!"</span><span class="p">;</span>
+<span class="kt">string</span> <span class="n">result</span> <span class="p">=</span> <span class="n">Razor</span><span class="p">.</span><span class="nf">Parse</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="k">new</span> <span class="p">{</span> <span class="n">Name</span> <span class="p">=</span> <span class="s">"World"</span> <span class="p">});</span>
+</code></pre></div>
+<p>You may download it from NuGet. Just type it in to your package manager console: <strong>Install-Package RazorEngine</strong>.</p>
+
+
+  
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'mylifeecho'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+</article>
+
+        </div>
+        <div class="sidebar five columns">
+          <article class="widget">
+    <header>
+        <h3>About me</h3>
+    </header>
+    <p>My name is Alexey Rodiontsev. I&rsquo;m a software engineer at Irdeto B.V., Amsterdam, The Netherlands.</p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Connect</h3> 
+    </header>
+    <p>
+      <a href="https://twitter.com/klappvisor" title="twitter">
+        <img src="/assets/sidebar/c-icon-twi.png" alt="" width="64" height="64" />
+      </a>
+      <a href="https://github.com/klappvisor" title="GitHub">
+        <img src="/assets/sidebar/c-icon-git.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://www.linkedin.com/in/alexeyrodiontsev" title="Linked In">
+        <img src="/assets/sidebar/c-icon-in.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://feeds.feedburner.com/mylifeecho" title="RSS">
+        <img src="/assets/sidebar/c-icon-rss.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://stackoverflow.com/users/793874/" title="stackoverflow">
+        <img src="/assets/sidebar/icon-stacko.png" alt="" width="64" height="64" />
+      </a>
+      <a href="https://github.com/mylifeecho" title="examples">
+        <img src="/assets/sidebar/c-icon-git.png" alt="" style="margin-left: 5px; margin-bottom: 3px;" width="32" height="32" />
+      </a>
+    </p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Recommended Reading</h3>
+    </header>
+    <ul style="padding-left: 0;">
+      <li><a href="/books#code-complete">Code Complete</a></li>
+      <li><a href="/books#design-patterns">Design patterns : elements of reusable object-oriented software</a></li>
+      <li><a href="/books#csharp-in-a-nutshell">C# in a Nutshell</a></li>
+      <li><a href="/books#31days-of-refactoring">31 days of refactoring</a></li>
+    </ul>
+    <p></p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Others</h3>
+    </header>
+    <p>
+      <a href="/certifications">
+        <img src="/assets/sidebar/MCSD(rgb)_1477.png" alt="MCSD: Web Applications" style="float: initial;" width="217" height="63" />
+      </a>
+    </p>
+    <p></p>
+</article>
+        </div>
+      </div>
+      
+      <div id="footer-wrapper">
+          <footer class="container">
+              <p>&copy; 2015 Alexey Rodiontsev
+                with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+              </p>
+          </footer>
+      </div>
+
+    
+  </body>
+</html>

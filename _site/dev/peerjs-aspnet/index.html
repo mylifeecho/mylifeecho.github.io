@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>mylifeecho - PeerJS + ASP.NET</title>
+    <meta name="description" content="Progress in Web development astonishes. We spend less time using desktop applications and more time using only browser. There are powerful web tools like Google Drive and Office Live, online dictionaries and translators, messengers, graphics editors, 3D games and even IDEs. You need just have the Internet and modern browser. More and more features constantly appear. And one of them is peer-to-peer networking between browsers. Now I’m going to show how you can add peer-2-peer interaction between clients into your ASP.NET application with using PeerJS step by step.">
+    <meta name="author" content="Alexey Rodiontsev">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/base.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/skeleton.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/layout.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/theme.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/github.css">
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Favicons
+    ================================================== -->
+    <link rel="shortcut icon" href="/assets/themes/lifeecho/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/assets/themes/lifeecho/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/themes/lifeecho/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/assets/themes/lifeecho/images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+      <div id="header" class="sixteen columns">
+          <div id="header-container" class="container">
+              <div id="branding" class="five columns">
+                  <h1><a href="/">mylifeecho</a></h1>
+                  <h5>Alexey Rodiontsev's personal blog</h5>
+              </div>
+              <div id="layout-navigation">
+                  <nav>
+                    <ul class="menu menu-main-menu">
+                      <li class="first"><a href="/">Blog</a></li>
+                      <li><a href="/notes-tips-tricks">Notes, Tips and Tricks</a></li>
+                      <li class="last"><a href="/about">About</a></li>
+                    </ul>
+                  </nav>
+              </div>
+          </div>
+      </div>
+      <div id="main" class="container">
+        <div class="content eleven columns">
+          
+<article class="content-item blog-post">
+  <header>
+    <h1>PeerJS + ASP.NET </h1>
+    
+    <div class="tags">Tags:
+      <ul class="tag_box inline">
+        
+        
+
+
+  
+     
+    	<li><a href="#PeerJS-ref">PeerJS <span>1</span></a></li>
+     
+    	<li><a href="#Node.js-ref">Node.js <span>1</span></a></li>
+     
+    	<li><a href="#iisnode-ref">iisnode <span>1</span></a></li>
+     
+    	<li><a href="#ASP.NET-ref">ASP.NET <span>1</span></a></li>
+     
+    	<li><a href="#peer-2-peer-ref">peer-2-peer <span>1</span></a></li>
+    
+  
+
+
+
+      </ul>
+    </div>
+    
+    <div class="metadata">
+      <div class="published">23 Jun 2013</div>
+    </div>
+  </header>
+
+  <p>Progress in Web development astonishes. We spend less time using desktop applications and more time using only browser. There are powerful web tools like Google Drive and Office Live, online dictionaries and translators, messengers, graphics editors, 3D games and even IDEs. You need just have the Internet and modern browser. More and more features constantly appear. And one of them is peer-to-peer networking between browsers. Now I’m going to show how you can add peer-2-peer interaction between clients into your ASP.NET application with using PeerJS step by step.</p>
+
+<p>PeerJS is amazing javascript library contains two parts: client-side and server-side written for Node.js. It wraps WebRTC implementation API and helps to easily establish p2p communication between browsers. I recommend you to play with it on <a href="http://peerjs.com">PeerJS site</a>, read good <a href="http://peerjs.com/docs/#start">Get Started</a> and <a href="http://peerjs.com/docs/#api">API Documantation</a> pages and <a href="https://github.com/peers/peerjs/tree/master/examples">try few demos</a>. There is a cloud server for establishing peer-to-peer communication which you can use for free for up to 50 concurrent clients but if you think that you need your own server in context of ASP.NET application I hope this post would be interest for you.</p>
+
+<p>I will use example of <a href="http://cdn.peerjs.com/demo/chat.html">advanced p2p</a> chat from demo page of PeerJS because client side is one and the same for ASP.NET, Ruby on Rails or PHP, but it will be changed a bit to show situation when we already have ASP.NET Web application and you need to add and use own PeerJS server hosted on IIS.</p>
+
+<h2>Install PeerJS Server</h2>
+
+<p>PeerJS server is opensource and written for Node.js. IIS does not support Node.js out from the box, but there is Node.js handler for IIS named <strong>iisnode</strong> so you have to install it. The most easier way to do it with help of Web Platform Installer, but of course you can download and install it manually from here. More information about iisnode and detailed explanation why you may want to use Node.js on IIS you can find in post written by Scott Hanselman</p>
+
+<p><img src="/assets/posts/2013-06-23/iisnode_installation.png" alt="Install IISNode"></p>
+
+<p>After installation follow to the PeerJS server page on GitHub and download files from lib directory to for example Node folder. This files contain PeerServer module which we will use in our web application. Let’s create app.js and put a following code there:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'fs'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">PeerServer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./server'</span><span class="p">).</span><span class="nx">PeerServer</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PeerServer</span><span class="p">({</span> <span class="na">port</span><span class="p">:</span> <span class="mi">9000</span> <span class="p">});</span>
+</code></pre></div>
+<p>There are two differences from example in PeerJS readme: we have changed <strong>./server</strong> argument to load local version of module (not installed with npm) and skip passing SSL certificate for our test project. fs module could be used here to set SSL certificate or some configuration from file.</p>
+
+<p><img src="/assets/posts/2013-06-23/server_app.png" alt="App in Visual Studio"></p>
+
+<p>PeerJS server has dependencies from ws (work with WebSockets) and restify (REST api) packages which might need to install using npm package manager. I did it manually before start the server and got errors during installation of restify package, solved problems one by one, but when npm asked me to install .NET 3.5, I stopped it and was surprised that server works despite the problem with installation one of its dependency.</p>
+
+<p>The last thing we have to do to start server is add iisnode handler configuration to our Web.config and specify path to the PeerJS application.</p>
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;system.webserver&gt;</span>
+  <span class="nt">&lt;handlers&gt;</span>
+    <span class="nt">&lt;add</span> <span class="na">name=</span><span class="s">"iisnode"</span> <span class="na">path=</span><span class="s">"Node/app.js"</span> <span class="na">verb=</span><span class="s">"*"</span> <span class="na">modules=</span><span class="s">"iisnode"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/handlers&gt;</span>
+<span class="nt">&lt;/system.webserver&gt;</span>
+</code></pre></div>
+<p>Open your IIS Manager and follow to the the Handlers mappings section. You should see something like this. </p>
+
+<p><img src="/assets/posts/2013-06-23/iisnode.png" alt="NodeJS handler in IIS"></p>
+
+<p>After it if 9000 port is free, server starts and we can try to follow the link <code>http://localhost:9000/someid/id</code>. If everything is ok we will receive id from our server. </p>
+
+<h2>Client Side</h2>
+
+<p>Now we need to do small changes in code of our chat application. To play with server you can publish your web application to <a href="http://appharbor.com">AppHarbor</a>. They <a href="http://blog.appharbor.com/2013/02/19/websocket-support-for-net-and-node-js-apps">announced</a> support of node.js and web sockets which are required for p2p interaction.</p>
+
+<p>So I am going to launch ASP.NET application with PeerJS server in my Virtual Environment with Windows 8 (as I know there is an issue with web sockets support on Windows 7) and the first browser will be on virtual machine, but the second browser will be on host machine. So I set IP of my virtual machine here:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">peer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Peer</span><span class="p">({</span> <span class="na">host</span><span class="p">:</span> <span class="s1">'192.168.137.130'</span><span class="p">,</span> <span class="na">port</span><span class="p">:</span> <span class="mi">9000</span> <span class="p">});</span>
+</code></pre></div>
+<p>This is one difference from original chat example on PeerJS website. </p>
+
+<p>Let’s play with it.</p>
+
+<p>Browsers connect to server, get unique Ids and one user can connect to another by this id. After it they can send messages and files to each other. Below you can see browser on host machine on the left side and browser and IIS Manager in virtual machine on the right side.</p>
+
+<p><img src="/assets/posts/2013-06-23/test_online.png" alt="Chat online"></p>
+
+<p>Clients are connected and can interact, but what is happens if we shutdown the server?</p>
+
+<p><img src="/assets/posts/2013-06-23/test_offline.png" alt="Chat offline"></p>
+
+<p>Yes, it’s true p2p. Server is offline but clients are able to interact to each other </p>
+
+<h2>Summary</h2>
+
+<p>WebRTC is being implemented as well as work on PeerJS is in progress. It is pretty raw but I believe it will be ready soon. Once WebRTC standard is implemented it will be really amazing. There are a few known issues and restrictions with PeerJS at the moment of writing this post.</p>
+
+<p>DataChannel which uses for peer-2-peer communication is still implementing and available in stable version of Google Chrome 26+ and Nightly build of Firefox 22+
+Firefox and Chrome are not compatible yet, so you cannot establish p2p connection between them.
+You have to provide your own TURN server for compatibility with symmetric NATs. By default the STUN server provided by Google is used.
+About detailed and actual status of relations between WebRTC and PeerJS you can find here.</p>
+
+<h2>References</h2>
+
+<ul>
+<li><a href="https://github.com/mylifeecho/peerjsapp">https://github.com/mylifeecho/peerjsapp</a> - source code from this post</li>
+<li><a href="http://peerjs.com">http://peerjs.com</a> - PeerJS site</li>
+<li><a href="http://peerjs.com/peerserver">http://peerjs.com/peerserver</a> - cloud PeerJS server</li>
+<li><a href="https://github.com/peers/peerjs-server">https://github.com/peers/peerjs-server</a> - source code of PeerJS Server</li>
+</ul>
+
+
+  
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'mylifeecho'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+</article>
+
+        </div>
+        <div class="sidebar five columns">
+          <article class="widget">
+    <header>
+        <h3>About me</h3>
+    </header>
+    <p>My name is Alexey Rodiontsev. I&rsquo;m a software engineer at Irdeto B.V., Amsterdam, The Netherlands.</p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Connect</h3> 
+    </header>
+    <p>
+      <a href="https://twitter.com/klappvisor" title="twitter">
+        <img src="/assets/sidebar/c-icon-twi.png" alt="" width="64" height="64" />
+      </a>
+      <a href="https://github.com/klappvisor" title="GitHub">
+        <img src="/assets/sidebar/c-icon-git.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://www.linkedin.com/in/alexeyrodiontsev" title="Linked In">
+        <img src="/assets/sidebar/c-icon-in.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://feeds.feedburner.com/mylifeecho" title="RSS">
+        <img src="/assets/sidebar/c-icon-rss.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://stackoverflow.com/users/793874/" title="stackoverflow">
+        <img src="/assets/sidebar/icon-stacko.png" alt="" width="64" height="64" />
+      </a>
+      <a href="https://github.com/mylifeecho" title="examples">
+        <img src="/assets/sidebar/c-icon-git.png" alt="" style="margin-left: 5px; margin-bottom: 3px;" width="32" height="32" />
+      </a>
+    </p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Recommended Reading</h3>
+    </header>
+    <ul style="padding-left: 0;">
+      <li><a href="/books#code-complete">Code Complete</a></li>
+      <li><a href="/books#design-patterns">Design patterns : elements of reusable object-oriented software</a></li>
+      <li><a href="/books#csharp-in-a-nutshell">C# in a Nutshell</a></li>
+      <li><a href="/books#31days-of-refactoring">31 days of refactoring</a></li>
+    </ul>
+    <p></p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Others</h3>
+    </header>
+    <p>
+      <a href="/certifications">
+        <img src="/assets/sidebar/MCSD(rgb)_1477.png" alt="MCSD: Web Applications" style="float: initial;" width="217" height="63" />
+      </a>
+    </p>
+    <p></p>
+</article>
+        </div>
+      </div>
+      
+      <div id="footer-wrapper">
+          <footer class="container">
+              <p>&copy; 2015 Alexey Rodiontsev
+                with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+              </p>
+          </footer>
+      </div>
+
+    
+  </body>
+</html>

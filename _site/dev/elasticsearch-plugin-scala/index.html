@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>mylifeecho - Elasticsearch, Scala, Gradle. Writing plugin step-by-step</title>
+    <meta name="description" content="Elasticsearch is quite popular search engine, Scala is quite popular JVM language and Gradle is quite popular build tool. Let's try all of them at once.">
+    <meta name="author" content="Alexey Rodiontsev">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/base.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/skeleton.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/layout.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/theme.css">
+    <link rel="stylesheet" href="/assets/themes/lifeecho/stylesheets/github.css">
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Favicons
+    ================================================== -->
+    <link rel="shortcut icon" href="/assets/themes/lifeecho/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/assets/themes/lifeecho/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/themes/lifeecho/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/assets/themes/lifeecho/images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+      <div id="header" class="sixteen columns">
+          <div id="header-container" class="container">
+              <div id="branding" class="five columns">
+                  <h1><a href="/">mylifeecho</a></h1>
+                  <h5>Alexey Rodiontsev's personal blog</h5>
+              </div>
+              <div id="layout-navigation">
+                  <nav>
+                    <ul class="menu menu-main-menu">
+                      <li class="first"><a href="/">Blog</a></li>
+                      <li><a href="/notes-tips-tricks">Notes, Tips and Tricks</a></li>
+                      <li class="last"><a href="/about">About</a></li>
+                    </ul>
+                  </nav>
+              </div>
+          </div>
+      </div>
+      <div id="main" class="container">
+        <div class="content eleven columns">
+          
+<article class="content-item blog-post">
+  <header>
+    <h1>Elasticsearch, Scala, Gradle. Writing plugin step-by-step </h1>
+    
+    <div class="tags">Tags:
+      <ul class="tag_box inline">
+        
+        
+
+
+  
+     
+    	<li><a href="#Scala-ref">Scala <span>1</span></a></li>
+     
+    	<li><a href="#elasticsearch-ref">elasticsearch <span>1</span></a></li>
+     
+    	<li><a href="#Gradle-ref">Gradle <span>1</span></a></li>
+    
+  
+
+
+
+      </ul>
+    </div>
+    
+    <div class="metadata">
+      <div class="published">31 May 2015</div>
+    </div>
+  </header>
+
+  <p>According to wiki</p>
+
+<blockquote>
+<p>Elasticsearch is a search server based on Lucene. It provides a distributed, multitenant-capable full-text search engine with a RESTful web interface and schema-free JSON documents.</p>
+</blockquote>
+
+<p>After more then one year of extensive experience with elasticsearch, I can say it does work very well. Elasticsearch developers made very good job not only to develop high quality search database but also to keep it out of new features which are not necessary and be focused on critical and generic functionality. At the same time they provide very good plugin system to extend elasticsearch for you needs when basic functionality is not enough for you. You can find a lot of different plugins on Github which monitor elasticsearch cluster, collect data from different sources like Twitter, RabbitMQ, MongoDB (so called &quot;rivers&quot;), Forsquare <a href="https://github.com/foursquare/es-scorer-plugin">published on github</a> plugin for custom geo-based scoring (written in Scala by the way) and many more. I&#39;m going to describe how to build simple hello world plugin in Scala using Gradle, release it on Github and start to use it.</p>
+
+<h2>Install Environment</h2>
+
+<p>I will use <a href="https://www.jetbrains.com/idea/">IntelliJ IDE</a> Community edition. It has built in support for Gradle. If you are not familliar with Gradle yet and don&#39;t know why you should spend time on it, just read top 3 from Google search &quot;<a href="https://google.com/?q=why+gradle">Why Gradle</a>&quot;. I like it for most of its advantages, but I love it for flexibility given by Groovy (you can code tasks in your build script the same way using Rake for Ruby or FAKE for .NET) and easy to read syntax in comparison to old XML based build tools.
+We are going to develop elasticsearch plugin in <a href="http://www.scala-lang.org/download/">Scala</a>. There is a nice build tool for Scala called SBT. It&#39;s definetelly tool to go on pure Scala projects, but usually we have already Java project (and got lucky to have Gradle as a build tool. if not, you may consider <a href="http://maruhgar.blogspot.nl/2010/12/converting-maven-project-to-gradle.html">migration from Maven</a>). Your team is suttisfied to use Java for mainstream development, but new plugin is more likely will be easier to write in functional style, because you need to do a custom text analysis or processing, and functional languages are proved suitable tool for that. You are most likely don&#39;t think even to change build tool just for ~3% of you codebase. With Gradle it&#39;s very easy to build your plugin in Scala.
+So make sure you have <a href="http://www.scala-lang.org/download/">Scala</a>, <a href="https://gradle.org/">Gradle</a> and <a href="https://www.elastic.co/downloads/elasticsearch">elasticsearch</a> installed and of course Java installed. I will use Java 8.</p>
+
+<h2>Building elasticsearch plugin with Gradle</h2>
+
+<p>Elasticsearch plugin is zip file which contains jar file with main plugin class and all dependencies in it. There is another option just <code>_site</code> folder with website content (see <a href="https://github.com/lukas-vlcek/bigdesk">bigdesk pluging repository</a> as example), but we will write real scala plugin which will integrate into elasticsearch and extend its functionality. Basic build process is the following: compile plugin code, run tests and archive with all necessary depepndencies. Resulting archive is a valid plugin distribution.</p>
+
+<p>Create Gradle project in IntelliJ or just create <code>build.gradle</code> file.
+Gradle build script with annotations:</p>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">'scala'</span> <span class="cm">/* to build scala code.
+    if you have mixed project with scala and java,
+    you can add second line with java instead of scala */</span>
+
+<span class="n">sourceCompatibility</span> <span class="o">=</span> <span class="mf">1.8</span>
+<span class="n">version</span> <span class="o">=</span> <span class="s1">'1.0'</span>
+
+<span class="n">repositories</span> <span class="o">{</span>
+    <span class="n">mavenCentral</span><span class="o">()</span>
+    <span class="n">mavenLocal</span><span class="o">()</span>
+<span class="o">}</span>
+<span class="c1">// additional configuration to tag dependencies to be archived with plugin jar
+</span><span class="n">configurations</span> <span class="o">{</span>
+    <span class="n">includeJars</span>
+<span class="o">}</span>
+
+<span class="n">dependencies</span> <span class="o">{</span>
+    <span class="n">compile</span> <span class="s1">'org.scala-lang:scala-library:2.11.4'</span>
+    <span class="n">compile</span> <span class="s1">'org.elasticsearch:elasticsearch:1.5.2'</span> <span class="c1">// same the server version of your elasticsearch
+</span>    <span class="n">testCompile</span> <span class="s1">'junit:junit:4.11'</span>
+    <span class="n">includeJars</span> <span class="s1">'org.scala-lang:scala-library:2.11.4'</span> <span class="c1">// include this dependency
+</span><span class="o">}</span>
+<span class="c1">// task to archive plugin jars
+</span><span class="n">task</span> <span class="nf">buildPluginZip</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Zip</span><span class="o">,</span> <span class="nl">dependsOn:</span><span class="o">[</span><span class="s1">':jar'</span><span class="o">])</span> <span class="o">{</span>
+    <span class="n">baseName</span> <span class="o">=</span> <span class="s1">'hello-plugin'</span>
+    <span class="n">classifier</span> <span class="o">=</span> <span class="s1">'plugin'</span>
+    <span class="n">from</span> <span class="nf">files</span><span class="o">(</span><span class="n">libsDir</span><span class="o">)</span> <span class="c1">// include output dirictory into archive
+</span>    <span class="n">from</span> <span class="o">{</span> <span class="n">configurations</span><span class="o">.</span><span class="na">includeJars</span><span class="o">.</span><span class="na">collect</span> <span class="o">{</span> <span class="n">it</span> <span class="o">}</span> <span class="o">}</span> <span class="c1">// include dependencies to archive
+</span><span class="o">}</span>
+<span class="c1">// define artifacts
+</span><span class="n">artifacts</span> <span class="o">{</span>
+    <span class="n">archives</span> <span class="n">buildPluginZip</span>
+<span class="o">}</span>
+</code></pre></div>
+<p>Run Gradle build with the following console command</p>
+<div class="highlight"><pre><code class="language-" data-lang="">gradle build buildPluginZip
+</code></pre></div>
+<p>As the result we will have zip file ready to install to elasticsearch</p>
+<div class="highlight"><pre><code class="language-" data-lang="">bin\plugin --install hello-plugin --url=file://path_to_zip/hello-plugin.zip
+</code></pre></div>
+<h2>Elasticsearch Hello plugin</h2>
+
+<p>1) Our first step will be to create the main class of the plugin extended from <code>org.elasticsearch.plugins.AbstractPlugin</code>, define name (line 7) and description (line 9) for your plugin. Since we want to build REST endpoint we have to import <code>org.elasticsearch.rest._</code> and add method <code>onModule(module:RestModule):Unit</code> (line 11). Elasticsearch dependency injection is based on Google&#39;s DI framework <a href="https://github.com/google/guice">Guice</a>, it will call this method and pass <code>RestModule</code> instance, so you can register your class which containes definition of REST action.</p>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">package</span> <span class="nn">hello.elasticsearch</span>
+
+<span class="k">import</span> <span class="nn">org.elasticsearch.plugins.AbstractPlugin</span>
+<span class="k">import</span> <span class="nn">org.elasticsearch.rest._</span>
+
+<span class="k">class</span> <span class="nc">HelloPlugin</span> <span class="k">extends</span> <span class="nc">AbstractPlugin</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">name</span><span class="o">()</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="s">"hello-plugin"</span>
+
+  <span class="k">override</span> <span class="k">def</span> <span class="n">description</span><span class="o">()</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="s">"Hello plugin"</span>
+
+  <span class="k">def</span> <span class="n">onModule</span><span class="o">(</span><span class="n">module</span><span class="k">:</span> <span class="kt">RestModule</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">module</span><span class="o">.</span><span class="n">addRestAction</span><span class="o">(</span><span class="n">classOf</span><span class="o">[</span><span class="kt">HelloAction</span><span class="o">])</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+<p>2) Create <code>HelloAction.scala</code> file with class which inherited from <code>BaseRestHandler</code>. Annotation <code>@Inject</code> tells DI container to inject appropriate dependencies (line 9). We will define the same arguments we have to pass to base class constructor. Scala&#39;s primary contractor which is basically body of the class looks pretty laconic and beautiful, doesn&#39;t it?</p>
+
+<p>3) We just need to register this class as a handler. We will use <code>_</code> before the url to avoid possible conflicts with usage <code>hello</code> as index name. So the next line after class definition is <code>controller.registerHandler(GET, &quot;/_hello&quot;, this)</code> (line 10).</p>
+
+<p>4) <code>HelloAction</code> class is not going to be abstract, so we have to implement <code>handleRequest(RestRequest, RestChannel, Client):Unit</code> (line 11). Using <code>RestRequest</code> we obtain <code>name</code> query parameter, execute <code>answer</code> method and send response to <code>RestChannel</code>. <code>answer(String):String</code> method is implemented using awesome pattern matching.</p>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">package</span> <span class="nn">hello.elasticsearch</span>
+<span class="cm">/* all imports */</span>
+<span class="k">class</span> <span class="nc">HelloAction</span> <span class="nd">@Inject</span><span class="o">()</span> <span class="o">(</span><span class="n">settings</span><span class="k">:</span> <span class="kt">Settings</span><span class="o">,</span> <span class="n">controller</span><span class="k">:</span> <span class="kt">RestController</span><span class="o">,</span> <span class="n">client</span><span class="k">:</span><span class="kt">Client</span><span class="o">)</span>
+    <span class="k">extends</span> <span class="nc">BaseRestHandler</span><span class="o">(</span><span class="n">settings</span><span class="o">,</span> <span class="n">controller</span><span class="o">,</span> <span class="n">client</span><span class="o">)</span> <span class="o">{</span>
+
+  <span class="n">controller</span><span class="o">.</span><span class="n">registerHandler</span><span class="o">(</span><span class="nc">GET</span><span class="o">,</span> <span class="s">"/_hello"</span><span class="o">,</span> <span class="k">this</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="n">handleRequest</span><span class="o">(</span><span class="n">request</span><span class="k">:</span> <span class="kt">RestRequest</span><span class="o">,</span> <span class="n">channel</span><span class="k">:</span> <span class="kt">RestChannel</span><span class="o">,</span> <span class="n">client</span><span class="k">:</span> <span class="kt">Client</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
+    <span class="n">channel</span><span class="o">.</span><span class="n">sendResponse</span><span class="o">(</span><span class="k">new</span> <span class="nc">BytesRestResponse</span><span class="o">(</span><span class="nc">RestStatus</span><span class="o">.</span><span class="nc">OK</span><span class="o">,</span> <span class="n">answer</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="n">param</span><span class="o">(</span><span class="s">"name"</span><span class="o">))))</span>
+
+  <span class="k">private</span> <span class="k">def</span> <span class="n">answer</span><span class="o">(</span><span class="n">who</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Option</span><span class="o">(</span><span class="n">who</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="s">"Robert"</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="s">"Your Grace!"</span>
+    <span class="k">case</span> <span class="nc">None</span> <span class="o">|</span> <span class="nc">Some</span><span class="o">(</span><span class="s">""</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="s">"I don't talk to strangers."</span>
+    <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="s">"Hello, "</span> <span class="o">+</span> <span class="n">who</span> <span class="o">+</span> <span class="s">"!"</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+<p>5) <strong>Probably the most important step</strong> to make your plugin visible to elasticsearch is to add <code>es-plugin.properties</code> file to the resources directory with the following content:</p>
+<div class="highlight"><pre><code class="language-properties" data-lang="properties"><span class="py">plugin</span><span class="p">=</span><span class="s">hello.elasticsearch.HelloPlugin</span>
+</code></pre></div>
+<p>If you forget to do so, even after successful installation of the plugin, elasticsearch will ignore your plugin and you may waste your time trying to figure out what&#39;s wrong with your code.</p>
+
+<h2>Debugging elasticsearch plugin</h2>
+
+<p>We already have elasticsearch dependency in our project with full functional elasticsearch node. At the matter of fact one of the options to connect to elasticsearch cluster using Java API is to start embedded node instance inside your application. Thus debugging of your plugin is very easy. You just need to add run configuration with main class <code>org.elasticsearch.bootstrap.ElasticsearchF</code>. You can use VM options to change elasticsearch configuration. Any option in <code>elasticsearch.yml</code> file can be used with <code>es.</code> prefix. So for instance if you want to change cluster name to debug your plugin, add <code>-Des.cluster.name=my-cluster</code> to VM options when it&#39;s just <code>cluster.name</code> in <code>elasticsearch.yml</code> file.</p>
+
+<p>You can also add <code>run</code> task to your Gradle build script and run you app using <code>gradle build run</code> command.</p>
+<div class="highlight"><pre><code class="language-gradle" data-lang="gradle">task run(type: JavaExec, dependsOn: classes) {
+    main = 'org.elasticsearch.bootstrap.ElasticsearchF'
+    classpath sourceSets.main.runtimeClasspath
+    classpath configurations.runtime
+}
+</code></pre></div>
+<h2>Define modules as alternative solution</h2>
+
+<p>Usually plugin is something more than just REST endpoint and it&#39;s better to split our plugin on modules. First module can be our REST hello endpoint. The Hello module class must be inherited from <code>org.elasticsearch.common.inject.AbstractModule</code> and have overridden <code>configure</code> method to register handler</p>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="k">override</span> <span class="n">configure</span><span class="o">()</span><span class="k">:</span><span class="kt">Unit</span> <span class="o">=</span> <span class="n">bind</span><span class="o">(</span><span class="n">classOf</span><span class="o">[</span><span class="kt">HelloRestHandler</span><span class="o">]).</span><span class="n">asEagerSingleton</span>
+</code></pre></div>
+<p>You can register your modules by overriding <code>Collection&lt;Class&lt;? extends Module&gt;&gt; modules()</code> java method of the plugin class.
+First of all we need to define list of modules our plugin contains. We have to convert Scala list to Java list to satisfy Java interface. When you import <code>scala.collection.JavaConverters</code> conversion will happen implicitly, but according to <a href="http://twitter.github.io/effectivescala/">Effective Scala</a> book by Twitter it&#39;s recommended to use explicit <code>asJava</code> method, aiding reader. Finally the method will look like:</p>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="k">override</span> <span class="n">modules</span><span class="o">()</span> <span class="o">{</span>
+  <span class="nc">List</span><span class="o">(</span>
+       <span class="n">classOf</span><span class="o">[</span><span class="kt">HelloModule</span><span class="o">],</span>
+       <span class="n">classOf</span><span class="o">[</span><span class="kt">UselessModule</span><span class="o">]</span>
+  <span class="o">).</span><span class="n">asJava</span>
+<span class="o">}</span>
+</code></pre></div>
+<h2>Release!</h2>
+
+<p>Next step will be release our plugin to be able to install plugin using standard elasticsearch commnand. This command will look like <code>./bin/plugin --install mylifeecho/hello-plugin/0.0.1</code>. Version number of course should be according <a href="http://semver.org/">Semantic Versioning</a>, but keep in mind that your plugin builded for elasticsearch 1.3.x may not work on elasticsearch 1.4.x. In my case I had issue due to changes in interface of <code>BaseRestHandler</code> contructor between 1.3 and 1.4 versions. So you probably would like to have plugin version per minor elasticsearch version like <a href="https://github.com/elastic/elasticsearch-cloud-aws">these guys</a> do.
+When you run <code>./bin/plugin --install</code> command elasticsearch will try to access <code>download.elastic.co</code> first and than maven central in order to download your plugin.
+Follow <a href="http://central.sonatype.org/pages/ossrh-guide.html">OSSRH Guide</a> to deploy plugin and take a look at <a href="http://central.sonatype.org/pages/gradle.html">OSSRH Gradle</a>. After that you can install your plugin.</p>
+
+<p>Restart elasticsearch after installation. Output will be similar to</p>
+<div class="highlight"><pre><code class="language-" data-lang="">[2015-05-31 21:34:56,276][INFO ][node    ] [Varys] version[1.5.2], pid[8572], build[62ff986/2015-04-27T09:21:06Z]
+[2015-05-31 21:34:56,277][INFO ][node    ] [Varys] initializing ...
+[2015-05-31 21:34:56,296][INFO ][plugins ] [Varys] loaded [hello-plugin], sites []
+[2015-05-31 21:34:59,593][INFO ][node    ] [Varys] initialized
+[2015-05-31 21:34:59,740][INFO ][node    ] [Varys] starting ...
+</code></pre></div>
+<p>You can find the source code of hello plugin on <a href="https://github.com/mylifeecho/hello-plugin">Guthub</a> or install plugin with the command <code>bin\plugin --install hello-plugin --url http://bit.ly/1ADC0bB</code>.</p>
+
+<p>In my next blog post we are going to add support of new script language into elasticsearch.</p>
+
+
+  
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'mylifeecho'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+</article>
+
+        </div>
+        <div class="sidebar five columns">
+          <article class="widget">
+    <header>
+        <h3>About me</h3>
+    </header>
+    <p>My name is Alexey Rodiontsev. I&rsquo;m a software engineer at Irdeto B.V., Amsterdam, The Netherlands.</p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Connect</h3> 
+    </header>
+    <p>
+      <a href="https://twitter.com/klappvisor" title="twitter">
+        <img src="/assets/sidebar/c-icon-twi.png" alt="" width="64" height="64" />
+      </a>
+      <a href="https://github.com/klappvisor" title="GitHub">
+        <img src="/assets/sidebar/c-icon-git.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://www.linkedin.com/in/alexeyrodiontsev" title="Linked In">
+        <img src="/assets/sidebar/c-icon-in.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://feeds.feedburner.com/mylifeecho" title="RSS">
+        <img src="/assets/sidebar/c-icon-rss.png" alt="" width="64" height="64" />
+      </a>
+      <a href="http://stackoverflow.com/users/793874/" title="stackoverflow">
+        <img src="/assets/sidebar/icon-stacko.png" alt="" width="64" height="64" />
+      </a>
+      <a href="https://github.com/mylifeecho" title="examples">
+        <img src="/assets/sidebar/c-icon-git.png" alt="" style="margin-left: 5px; margin-bottom: 3px;" width="32" height="32" />
+      </a>
+    </p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Recommended Reading</h3>
+    </header>
+    <ul style="padding-left: 0;">
+      <li><a href="/books#code-complete">Code Complete</a></li>
+      <li><a href="/books#design-patterns">Design patterns : elements of reusable object-oriented software</a></li>
+      <li><a href="/books#csharp-in-a-nutshell">C# in a Nutshell</a></li>
+      <li><a href="/books#31days-of-refactoring">31 days of refactoring</a></li>
+    </ul>
+    <p></p>
+</article>
+<article class="widget">
+    <header>
+        <h3>Others</h3>
+    </header>
+    <p>
+      <a href="/certifications">
+        <img src="/assets/sidebar/MCSD(rgb)_1477.png" alt="MCSD: Web Applications" style="float: initial;" width="217" height="63" />
+      </a>
+    </p>
+    <p></p>
+</article>
+        </div>
+      </div>
+      
+      <div id="footer-wrapper">
+          <footer class="container">
+              <p>&copy; 2015 Alexey Rodiontsev
+                with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+              </p>
+          </footer>
+      </div>
+
+    
+  </body>
+</html>
