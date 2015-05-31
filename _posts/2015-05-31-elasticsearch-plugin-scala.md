@@ -133,7 +133,7 @@ We already have elasticsearch dependency in our project with full functional ela
 
 You can also add `run` task to your Gradle build script and run you app using `gradle build run` command.
 
-```gradle
+```groovy
 task run(type: JavaExec, dependsOn: classes) {
     main = 'org.elasticsearch.bootstrap.ElasticsearchF'
     classpath sourceSets.main.runtimeClasspath
