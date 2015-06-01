@@ -10,7 +10,7 @@ tags: [ Scala, elasticsearch, Gradle ]
 According to wiki
 > Elasticsearch is a search server based on Lucene. It provides a distributed, multitenant-capable full-text search engine with a RESTful web interface and schema-free JSON documents.
 
-After more then one year of extensive experience with elasticsearch, I can say it does work very well. Elasticsearch developers made very good job not only to develop high quality search database but also to keep it out of new features which are not necessary and be focused on critical and generic functionality. At the same time they provide very good plugin system to extend elasticsearch for you needs when basic functionality is not enough for you. You can find a lot of different plugins on Github which monitor elasticsearch cluster, collect data from different sources like Twitter, RabbitMQ, MongoDB (so called "rivers"), Forsquare [published on github][4sq] plugin for custom geo-based scoring (written in Scala by the way) and many more. I'm going to describe how to build simple hello world plugin in Scala using Gradle, release it on Github and start to use it.
+Elasticsearch developers made very good job not only to develop high quality search database but also to keep it out of new features which are not necessary and be focused on critical and generic functionality. At the same time they provide very good plugin system to extend elasticsearch for you needs when basic functionality is not enough for you. You can find a lot of different plugins on Github which monitor elasticsearch cluster, collect data from different sources like Twitter, RabbitMQ, MongoDB (so called "rivers"), Forsquare [published on github][4sq] plugin for custom geo-based scoring (written in Scala by the way) and many more. I'm going to describe how to build simple hello world plugin in Scala using Gradle, release it on Github and start to use it.
 
 ## Install Environment
 
@@ -20,7 +20,7 @@ So make sure you have [Scala][scala], [Gradle][gradle] and [elasticsearch][es] i
 
 ## Building elasticsearch plugin with Gradle
 
-Elasticsearch plugin is zip file which contains jar file with main plugin class and all dependencies in it. There is another option just `_site` folder with website content (see [bigdesk pluging repository][bigdesk] as example), but we will write real scala plugin which will integrate into elasticsearch and extend its functionality. Basic build process is the following: compile plugin code, run tests and archive with all necessary depepndencies. Resulting archive is a valid plugin distribution.
+Elasticsearch plugin is zip file which contains jar file with main plugin class and all dependencies in it. There is another option just `_site` folder with website content (see [bigdesk pluging repository][bigdesk] as example), but we will write real scala plugin which will integrate into elasticsearch and extend its functionality. Basic build process is the following: compile plugin code, run tests and archive with all necessary dependencies. Resulting archive is a valid plugin distribution.
 
 Create Gradle project in IntelliJ or just create `build.gradle` file.
 Gradle build script with annotations:
@@ -61,13 +61,13 @@ artifacts {
 }
 ```
 
-Run Gradle build with the following console command
+Run Gradle build with the following console command:
 
 ```
 gradle build buildPluginZip
 ```
 
-As the result we will have zip file ready to install to elasticsearch
+As the result we will have a zip file ready to install to elasticsearch
 
 ```
 bin\plugin --install hello-plugin --url=file://path_to_zip/hello-plugin.zip
@@ -177,7 +177,7 @@ Restart elasticsearch after installation. Output will be similar to
 [2015-05-31 21:34:59,740][INFO ][node    ] [Varys] starting ...
 ```
 
-You can find the source code of hello plugin on [Guthub][hello-src] or install plugin with the command `bin\plugin --install hello-plugin --url http://bit.ly/1ADC0bB`.
+You can find the source code of hello plugin on [Github][hello-src] or install plugin with the command `bin\plugin --install hello-plugin --url http://bit.ly/1ADC0bB`.
 
 In my next blog post we are going to add support of new script language into elasticsearch.
 
