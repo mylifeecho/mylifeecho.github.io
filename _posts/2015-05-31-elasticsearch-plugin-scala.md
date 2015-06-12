@@ -16,11 +16,11 @@ Elasticsearch developers made very good job not only to develop high quality sea
 
 I will use [IntelliJ IDE][idea] Community edition. It has built in support for Gradle. If you are not familliar with Gradle yet and don't know why you should spend time on it, just read top 3 from Google search "[Why Gradle][why-gradle]". I like it for most of its advantages, but I love it for flexibility given by Groovy (you can code tasks in your build script the same way using Rake for Ruby or FAKE for .NET) and easy to read syntax in comparison to old XML based build tools.
 We are going to develop elasticsearch plugin in [Scala][scala]. There is a nice build tool for Scala called SBT. It's definetelly tool to go on pure Scala projects, but usually we have already Java project (and got lucky to have Gradle as a build tool. if not, you may consider [migration from Maven][mvn2gradle]). Your team is suttisfied to use Java for mainstream development, but new plugin is more likely will be easier to write in functional style, because you need to do a custom text analysis or processing, and functional languages are proved suitable tool for that. You are most likely don't think even to change build tool just for ~3% of you codebase. With Gradle it's very easy to build your plugin in Scala.
-So make sure you have [Scala][scala], [Gradle][gradle] and [elasticsearch][es] installed and of course Java installed. I will use Java 8.
+So make sure you have [Scala][scala], [Gradle][gradle] and [elasticsearch][es] installed and of course Java installed.
 
 ## Building elasticsearch plugin with Gradle
 
-Elasticsearch plugin is zip file which contains jar file with main plugin class and all dependencies in it. There is another option just `_site` folder with website content (see [bigdesk pluging repository][bigdesk] as example), but we will write real scala plugin which will integrate into elasticsearch and extend its functionality. Basic build process is the following: compile plugin code, run tests and archive with all necessary dependencies. Resulting archive is a valid plugin distribution.
+Elasticsearch plugin is zip file which contains jar file with main plugin class and all dependencies in it. There is another option just `_site` folder with website content (see [bigdesk pluging repository][bigdesk] as example), but we will write real scala plugin which will integrate into elasticsearch and extend its functionality using provided Java API. Basic build process is the following: compile plugin code, run tests and archive with all necessary dependencies. Resulting archive is a valid plugin distribution.
 
 Create Gradle project in IntelliJ or just create `build.gradle` file.
 Gradle build script with annotations:
@@ -30,7 +30,7 @@ apply plugin: 'scala' /* to build scala code.
     if you have mixed project with scala and java,
     you can add second line with java instead of scala */
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.6
 version = '1.0'
 
 repositories {
@@ -75,7 +75,7 @@ bin\plugin --install hello-plugin --url=file://path_to_zip/hello-plugin.zip
 
 ## Elasticsearch Hello plugin
 
-1) Our first step will be to create the main class of the plugin extended from `org.elasticsearch.plugins.AbstractPlugin`, define name (line 7) and description (line 9) for your plugin. Since we want to build REST endpoint we have to import `org.elasticsearch.rest._` and add method `onModule(module:RestModule):Unit` (line 11). Elasticsearch dependency injection is based on Google's DI framework [Guice][guice], it will call this method and pass `RestModule` instance, so you can register your class which containes definition of REST action.
+1) Our first step will be to create the main class of the plugin extended from `org.elasticsearch.plugins.AbstractPlugin`, define name (line 7) and description (line 9) for your plugin. Since we want to build REST endpoint we have to import `org.elasticsearch.rest._` and add method `onModule(module:RestModule):Unit` (line 11). Elasticsearch dependency injection is based on Google's DI framework [Guice][guice], it will call this method and pass `RestModule` instance, so you can register your class which contains definition of REST action.
 
 ```scala
 package hello.elasticsearch
@@ -94,7 +94,7 @@ class HelloPlugin extends AbstractPlugin {
 }
 ```
 
-2) Create `HelloAction.scala` file with class which inherited from `BaseRestHandler`. Annotation `@Inject` tells DI container to inject appropriate dependencies (line 9). We will define the same arguments we have to pass to base class constructor. Scala's primary contractor which is basically body of the class looks pretty laconic and beautiful, doesn't it?
+2) Create `HelloAction.scala` file with class inherited from `BaseRestHandler`. Annotation `@Inject` tells DI container to inject appropriate dependencies (line 9). We will define the same arguments we have to pass to base class constructor. Scala's primary contractor which is basically body of the class looks pretty laconic and beautiful, doesn't it?
 
 3) We just need to register this class as a handler. We will use `_` before the url to avoid possible conflicts with usage `hello` as index name. So the next line after class definition is `controller.registerHandler(GET, "/_hello", this)` (line 10).
 
@@ -143,14 +143,14 @@ task run(type: JavaExec, dependsOn: classes) {
 
 ## Define modules as alternative solution
 
-Usually plugin is something more than just REST endpoint and it's better to split our plugin on modules. First module can be our REST hello endpoint. The Hello module class must be inherited from `org.elasticsearch.common.inject.AbstractModule` and have overridden `configure` method to register handler
+Usually plugin is something more than just REST endpoint and it's better to split our plugin on modules. First module can be our REST hello endpoint. The Hello module class must be inherited from `org.elasticsearch.common.inject.AbstractModule` and have overridden `configure` method to register the handler
 
 ```scala
 def override configure():Unit = bind(classOf[HelloRestHandler]).asEagerSingleton
 ```
 
 You can register your modules by overriding `Collection<Class<? extends Module>> modules()` java method of the plugin class.
-First of all we need to define list of modules our plugin contains. We have to convert Scala list to Java list to satisfy Java interface. When you import `scala.collection.JavaConverters` conversion will happen implicitly, but according to [Effective Scala][effective-scala] book by Twitter it's recommended to use explicit `asJava` method, aiding reader. Finally the method will look like:
+First of all we need to define the list of modules our plugin contains. We have to convert Scala list to Java list to satisfy Java interface. When you import `scala.collection.JavaConverters` conversion will happen implicitly, but according to [Effective Scala][effective-scala] book by Twitter it's recommended to use explicit `asJava` method, aiding reader. Finally the method will look like:
 
 ```scala
 def override modules() {
