@@ -46,6 +46,7 @@ class BrainfuckScriptEngineService @Inject() (settings: Settings) extends Abstra
   override def search(compiledScript: scala.Any, lookup: SearchLookup, vars: util.Map[String, AnyRef]): SearchScript = {
     new BrainfuckExecutableSearchScript(compiledScript.asInstanceOf[String])
   }
+  /*...*/
 }
 ```
 
@@ -69,9 +70,31 @@ class BrainfuckExecutableSearchScript(script: String) extends ExecutableScript w
 }
 ```
 
+Implementation of brainfuck evaluator as I mentioned already I took from [here][brainfuck-int] with one small change instead of printing value I return it.
 
+Let's build and deploy our plugin to instance of elasticsearch as described in last section of [previous post][hw-plugin]. TODO: Enable scripts!
+and try to use it!
+
+```
+curl -XPOST http://localhost:9200/ -d '
+'
+```
+Output of the Http request is:
+```json
+{}
+```
+
+## References
+
+[Elasticsearch Scripting][scripting-es]
+[Extending the Scripts Module][extending-scripts-module]
+[Source code of the plugin][plugin-src]
+[Plugin itself] Link can be used to install using command `bin\plugin --install lang-brainfuck --url {link}` in elasticsearh root directory.
 
 [hw-plugin]: http://mylifeecho.com/dev/elasticsearch-plugin-scala/
 [brainfuck]: https://en.wikipedia.org/wiki/Brainfuck
 [brainfuck-int]: http://peter-braun.org/2012/07/brainfuck-interpreter-in-40-lines-of-scala/
 [es-list-supported-lang]: https://www.elastic.co/guide/en/elasticsearch/reference/1.7/modules-plugins.html#scripting
+[scripting-es]: https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html
+[extending-scripts-module]: https://www.elastic.co/blog/found-extending-the-scripting-module
+[plugin-src]:
