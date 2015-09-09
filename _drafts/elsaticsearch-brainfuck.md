@@ -73,18 +73,36 @@ class BrainfuckExecutableSearchScript(script: String) extends ExecutableScript w
 Implementation of brainfuck evaluator as I mentioned already I took from [here][brainfuck-int] with one small change instead of printing value I return it.
 
 Let's build and deploy our plugin to instance of elasticsearch as described in last section of [previous post][hw-plugin]. 
-You have to enable dynamic scripting: `script.disable_dynamic: false` in config file.
+
+*You have to enable dynamic scripting: `script.inline: on` for elasticsearch 1.6+ `script.disable_dynamic: false` for elasticsearch below 1.6 in config file.* For more details see [Enable Dynamic Scripting][enable-scripting] section in official documentation.
 
 And try to use it!
 
 ```
-curl -XPOST http://localhost:9200/ -d '
+curl -XPOST http://localhost:9200/_search -d '
+{
+  "aggs": {
+    "script": {
+      "terms": {
+        "lang": "brainfuck",
+        "script": "++++++++++[>+++++++>++++++++++>+++<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+."}}},
+  "size": 0}
 '
 ```
-Output of the Http request is:
+
+Output of the Http request will be simmilar to:
+
 ```json
-{}
+{"aggregations": {
+  "script": {
+    "doc_count_error_upper_bound": 0,
+    "sum_other_doc_count": 0,
+    "buckets": [{
+      "key": "Hello World!",
+      "doc_count": 1}]}}}
 ```
+
+As you can see key of this bucket is the result of our brainfuck script!
 
 ## References
 
@@ -100,3 +118,4 @@ Output of the Http request is:
 [scripting-es]: https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html
 [extending-scripts-module]: https://www.elastic.co/blog/found-extending-the-scripting-module
 [plugin-src]:
+[enable-scripting]: https://www.elastic.co/guide/en/elasticsearch/reference/1.7/modules-scripting.html#enable-dynamic-scripting
