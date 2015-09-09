@@ -78,28 +78,28 @@ Let's build and deploy our plugin to instance of elasticsearch as described in l
 
 And try to use it!
 
-```
+```json
 curl -XPOST http://localhost:9200/_search -d '
 {
   "aggs": {
     "script": {
       "terms": {
         "lang": "brainfuck",
-        "script": "++++++++++[>+++++++>++++++++++>+++<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+."}}},
-  "size": 0}
+        "script": "++++++++++[>+++++++>++++++++++>+++<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+."}}}}
 '
 ```
 
 Output of the Http request will be simmilar to:
 
 ```json
-{"aggregations": {
-  "script": {
-    "doc_count_error_upper_bound": 0,
-    "sum_other_doc_count": 0,
-    "buckets": [{
-      "key": "Hello World!",
-      "doc_count": 1}]}}}
+{
+  "aggregations": {
+    "script": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [{
+        "key": "Hello World!",
+        "doc_count": 1}]}}}
 ```
 
 As you can see key of this bucket is the result of our brainfuck script!
