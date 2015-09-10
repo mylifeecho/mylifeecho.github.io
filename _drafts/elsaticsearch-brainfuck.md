@@ -106,10 +106,10 @@ As you can see key of this bucket is the result of our brainfuck script!
 
 ## References
 
-[Elasticsearch Scripting][scripting-es]
-[Extending the Scripts Module][extending-scripts-module]
-[Source code of the plugin][plugin-src]
-[Plugin itself] Link can be used to install using command `bin\plugin --install lang-brainfuck --url {link}` in elasticsearh root directory.
+* [Elasticsearch Scripting][scripting-es]
+* [Extending the Scripts Module][extending-scripts-module]
+* [Source code of the plugin][plugin-src]
+* [Plugin itself][plugin-zip] Link can be used to install by running command `bin\plugin --install lang-brainfuck --url https://github.com/mylifeecho/elasticsearch-lang-brainfuck/releases/download/0.0.1/elasticsearch-lang-brainfuck-0.0.1-plugin.zip` in elasticsearh root directory.
 
 [hw-plugin]: http://mylifeecho.com/dev/elasticsearch-plugin-scala/
 [brainfuck]: https://en.wikipedia.org/wiki/Brainfuck
@@ -117,5 +117,6 @@ As you can see key of this bucket is the result of our brainfuck script!
 [es-list-supported-lang]: https://www.elastic.co/guide/en/elasticsearch/reference/1.7/modules-plugins.html#scripting
 [scripting-es]: https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html
 [extending-scripts-module]: https://www.elastic.co/blog/found-extending-the-scripting-module
-[plugin-src]:
+[plugin-src]: https://github.com/mylifeecho/elasticsearch-lang-brainfuck
 [enable-scripting]: https://www.elastic.co/guide/en/elasticsearch/reference/1.7/modules-scripting.html#enable-dynamic-scripting
+[plugin-zip]: https://github.com/mylifeecho/elasticsearch-lang-brainfuck/releases/download/0.0.1/elasticsearch-lang-brainfuck-0.0.1-plugin.zip
