@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Brainfuck scripting support for elasticsearch"
+title: "Elasticsearch language plugin for Brainfuck scripting"
 description: "We as a programmers like some programming languages and some of them... we are not interested in at all. It hurts so badly when you don't have an option to use your lovely language when you clearly see how beautiful solution written in this language will be. Sometimes you have to resign to your fate. But not this time!"
 category: dev
 tags: [ Scala, elasticsearch, Brainfuck ]
