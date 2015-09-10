@@ -102,7 +102,7 @@ Output of the Http request will be simmilar to:
         "doc_count": 1}]}}}
 ```
 
-As you can see key of this bucket is the result of our brainfuck script!
+As you can see the key of the bucket is the result of our brainfuck hello world script evaluation!
 
 ## References
 
