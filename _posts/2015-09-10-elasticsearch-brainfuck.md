@@ -1,13 +1,13 @@
 ---
 layout: post
 title: "Brainfuck scripting support for elasticsearch"
-description: "We as a programmers like some programming languages and some of them... we are not interested in at all. It hurts so badly when you don't have an option to use your lovely language when you clearly see how beautiful solution written in this language will be. Sometimes you have to resign to your fate. But not this time!" 
+description: "We as a programmers like some programming languages and some of them... we are not interested in at all. It hurts so badly when you don't have an option to use your lovely language when you clearly see how beautiful solution written in this language will be. Sometimes you have to resign to your fate. But not this time!"
 category: dev
 tags: [ Scala, elasticsearch, Brainfuck ]
 ---
 {% include JB/setup %}
 
-We as a programmers like some programming languages and some of them... we are not interested in at all. It hurts so badly when you don't have an option to use your lovely language when you clearly see how beautiful solution written in this language will be. Sometimes you have to resign to your fate. But not this time! 
+We as a programmers like some programming languages and some of them... we are not interested in at all. It hurts so badly when you don't have an option to use your lovely language when you clearly see how beautiful solution written in this language will be. Sometimes you have to resign to your fate. But not this time!
 
 Let's say you work with elasticsearch and you have to write some script. You take a look at the [list of supported languages][es-list-supported-lang] out of the box, than at list of plugins (same link) which add other languages. But no, groovy, javascript, python or closure are in your blacklist for some reasons. There is an option for you! Write your own plugin to extend elasticsearch functionality and you will be able to write scripts in preferred language. [Brainfuck][brainfuck] for instance!
 
@@ -39,7 +39,7 @@ class BrainfuckScriptEngineService @Inject() (settings: Settings) extends Abstra
 
   override def unwrap(value: AnyRef): AnyRef = value
   override def sandboxed(): Boolean = false
-  
+
   override def executable(compiledScript: scala.Any, vars: util.Map[String, AnyRef]): ExecutableScript = {
     new BrainfuckExecutableSearchScript(compiledScript.asInstanceOf[String])
   }
@@ -50,9 +50,9 @@ class BrainfuckScriptEngineService @Inject() (settings: Settings) extends Abstra
 }
 ```
 
-`compile(script:String)` method should return compiled version of the script but in our case we will return script itself since we implement support of brainfuck just using evaluator. 
+`compile(script:String)` method should return compiled version of the script but in our case we will return script itself since we implement support of brainfuck just using evaluator.
 `execute(compiledScript, vars)` has actual call to evaluate `compiledScript` but we will ignore `vars`.
-`unwrap(value:AnyRef)` can return value as is, `sandboxed()` returns `false`, the rest of the method can be empty except 
+`unwrap(value:AnyRef)` can return value as is, `sandboxed()` returns `false`, the rest of the method can be empty except
 two most interesting methods `executable` and `search` which have the same signature as `execute` method.
 
 They have to return instances of `ExecutableScript` and `SearchScript` respectively. For simplicity I will implement those interfaces in one class. For our minimal working solution we have to implement `run` method which will evaluate script we passed to contractor and methods `run{Something}` just do simple type cast of the `run` results to proper type.
@@ -60,45 +60,44 @@ They have to return instances of `ExecutableScript` and `SearchScript` respectiv
 ```scala
 class BrainfuckExecutableSearchScript(script: String) extends ExecutableScript with SearchScript {
   override def unwrap(value: scala.Any): AnyRef = value
-  
+
   override def run(): AnyRef = BrainfuckEval.eval(script.toCharArray)
   override def runAsFloat(): Float = run().asInstanceOf[Float]
   override def runAsLong(): Long = run().asInstanceOf[Long]
   override def runAsDouble(): Double = run().asInstanceOf[Double]
-  
+
   /*...*/
 }
 ```
 
 Implementation of brainfuck evaluator as I mentioned already I took from [here][brainfuck-int] with one small change instead of printing value I return it.
 
-Let's build and deploy our plugin to instance of elasticsearch as described in last section of [previous post][hw-plugin]. 
+Let's build and deploy our plugin to instance of elasticsearch as described in last section of [previous post][hw-plugin].
 
 *You have to enable dynamic scripting: `script.inline: on` for elasticsearch 1.6+ `script.disable_dynamic: false` for elasticsearch below 1.6 in config file.* For more details see [Enable Dynamic Scripting][enable-scripting] section in official documentation.
 
 And try to use it!
 
-```json
+```sh
 curl -XPOST http://localhost:9200/_search -d '
 {
   "aggs": {
     "script": {
       "terms": {
         "lang": "brainfuck",
-        "script": "++++++++++[>+++++++>++++++++++>+++<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+."}}}}
-'
+        "script": "++++++++++[>+++++++>++++++++++>+++<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+."}}}}'
 ```
 
 Output of the Http request will be simmilar to:
 
-```json
+```javascript
 {
   "aggregations": {
     "script": {
       "doc_count_error_upper_bound": 0,
       "sum_other_doc_count": 0,
       "buckets": [{
-        "key": "Hello World!",
+        "key": "Hello World!", // <--- result of script evaluation
         "doc_count": 1}]}}}
 ```
 
@@ -106,10 +105,14 @@ As you can see the key of the bucket is the result of our brainfuck hello world 
 
 ## References
 
-* [Elasticsearch Scripting][scripting-es]
-* [Extending the Scripts Module][extending-scripts-module]
-* [Source code of the plugin][plugin-src]
-* [Plugin itself][plugin-zip] Link can be used to install plugin by running command `bin\plugin --install lang-brainfuck --url https://github.com/mylifeecho/elasticsearch-lang-brainfuck/releases/download/0.0.1/elasticsearch-lang-brainfuck-0.0.1-plugin.zip` in elasticsearh root directory.
+1) [Elasticsearch Scripting][scripting-es]
+2) [Extending the Scripts Module][extending-scripts-module]
+3) [Source code of the plugin][plugin-src]
+4) [Plugin itself][plugin-zip] Link can be used to install plugin by running command in elasticsearh root directory
+
+```bash
+bin\plugin --install lang-brainfuck --url https://github.com/mylifeecho/elasticsearch-lang-brainfuck/releases/download/0.0.1/elasticsearch-lang-brainfuck-0.0.1-plugin.zip
+```
 
 [hw-plugin]: http://mylifeecho.com/dev/elasticsearch-plugin-scala/
 [brainfuck]: https://en.wikipedia.org/wiki/Brainfuck
