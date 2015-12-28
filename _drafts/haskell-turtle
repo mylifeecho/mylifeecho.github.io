@@ -1,0 +1,20 @@
+---
+layout: post
+title: "Command-line tool in Haskell step-by-step"
+description: ""
+category: dev
+tags: [ Haskell, Turtle ]
+---
+{% include JB/setup %}
+
+1. Use Stack as package management tool
+2. Create project using stack
+3. Add Turtle library for command-line tools
+4. Write first command
+5. Add flag to print version
+6. Add subcommand to print version information
+7. Add subcommand with arguments and options
+8. Extend your tool following Turtle tutorial
+
+
+
