@@ -15,7 +15,7 @@ After finishing [Introduction to Functional Programming][fp-edx] course on *edx*
 I'm going to use [stack][stack] package manager to create, build and run project.
 Run the following commands to create project:
 
-```shell
+```
 $ stack new any-tool simple
 $ cd any-tool
 ```
@@ -65,7 +65,7 @@ main = do
 Let's build it, run it and see output.
 If you run your tool using `stack` as I do you can pass arguments after `--`. Thus `stack exec any-tool -- subcommand --help` is equivalent of `any-tool subcommand --help`.
 
-```shell
+```
 $ stack build
 $ stack exec any-tool
 Any tool just works!
@@ -123,7 +123,7 @@ parser = parseMain <|> parseVersion
 
 Build and run the tool:
 
-```shell
+```
 $ any-tool version
 0.1.0.0
 Verbose version information
@@ -175,14 +175,14 @@ parser = parseMain <|> parseVersion <|> parsePrint
 
 Here we are. Build and run.
 
-```shell
+```
 $ any-tool print
 Usage: any-tool print [-n|--times TIMES] TEXT
 ```
 
 We forgot required argument and turtle shows us how to use `print` subcommand.
 
-```shell
+```
 $ any-tool print "text to print"
 text to print
 
@@ -194,7 +194,7 @@ it will appear 3 times
 
 And last but not least take a look at result help for main command and for `print` subcommand
 
-```shell
+```
 $ any-tool -h
 Just any tool you could imagine
 
@@ -208,7 +208,7 @@ Available commands:
   print
 ```
 
-```shell
+```
 $ any-tool print --help
 Print specified text specified number of times
 
