@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Command-line tool in Haskell step-by-step"
-description: ""
+description: "It's easy to write pretty nice command-line tool in Haskell with small amount of code."
 category: dev
 tags: [ Haskell, Turtle ]
 ---
