@@ -236,7 +236,9 @@ main = do
 ## Conclusions
 
 At the matter of fact Turtle is mainly focused to write shell scripts on Haskell but it also allows us to build pretty advanced command-line tools. If you are interested in more information about Turtle take a look at [official site] and [tutorial][turtle-tutorial].
+
 You can find code from this blog post [here on github][src]
+
 Happy coding!
 
 [fp-edx]: https://www.edx.org/course/introduction-functional-programming-delftx-fp101x-0
