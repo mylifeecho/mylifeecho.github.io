@@ -24,7 +24,7 @@ $ cd any-tool
 
 ### Step 2. Add Turtle library for command-line tools
 
-There is very nice library to write command-line tools in Haskell. Open any-tool.cabal file and add change yaml to have the following:
+ [Turtle][turtle] is very nice library to write command-line tools in Haskell. Open `any-tool.cabal` file and add change yaml to have the following:
 
 ```yaml
 build-depends: base >= 4.7 && < 5
@@ -34,9 +34,7 @@ Make sure you have the following header on top of `Main.hs`
 
 ```haskell
 {-# LANGUAGE OverloadedStrings #-}
-
 module Main where
-
 import Turtle
 ```
 
@@ -65,27 +63,27 @@ main = do
 ```
 
 Let's build it, run it and see output.
-If you run your tool using `stack` as I do you can pass arguments after `--`
+If you run your tool using `stack` as I do you can pass arguments after `--`. Thus `stack exec any-tool -- subcommand --help` is equivalent of `any-tool subcommand --help`.
 
 ```shell
 $ stack build
-$ stack exec any-tool-exe
+$ stack exec any-tool
 Any tool just works!
 
-$ stack exec any-tool-exe -- --help
+$ stack exec any-tool -- --help
 Just any tool you could imagine
 
-Usage: any-tool.exe
+Usage: any-tool
 
 Available options:
   -h,--help                Show this help text
 ```
 
-Looks OK: output is expected, help text pretty descriptive, but not very impressive so far.
+Output is expected, help text pretty descriptive. Looks OK but not very impressive so far. Let's extend command-line tool to have some extra functionality.
 
 ### Step 5. Print version
 
-To print version number of your tool you should  import `Data.Version` module and `version` function from the `Paths_{program_name}` file created by Cabal with module to retrieve version.
+To print version number of your tool you should import `Data.Version` module and `version` function from the `Paths_{program_name}` file created by Cabal with metadata and module to retrieve version inside.
 
 ```haskell
 import Paths_any_tool (version)
@@ -98,7 +96,7 @@ Then you can print version
 version' :: IO()
 version' = putStrLn (showVersion version)
 ```
-### Step #. Add subcommand to print version information
+### Step 6. Add subcommand to print version information
 
 Let's add a new subcommand to print verbose version information `any-tool version`
 
@@ -117,26 +115,33 @@ parseVersion =
     (subcommand "version" "Show the Awesome tool version" (pure verboseVersion))
 ```
 
-Last step is to add it to `parser`:
+Last step is to add it to main `parser`:
 
 ```haskell
 parser = parseMain <|> parseVersion
 ```
 
-Build and run tool:
+Build and run the tool:
 
 ```shell
 $ any-tool version
 0.1.0.0
 Verbose version information
+
+$ any-tool version --help
+Show any-tool version
+
+Usage: any-tool version
+
+Available options:
+  -h,--help                Show this help text
 ```
 
-### Step #. Add subcommand with arguments and options
+### Step 7. Add subcommand with arguments and options
 
-This step-by-step guide would be not complete without subcommand with command line arguments and options. Let's build subcommand that prints input text several times. By default it will print text once but we will add optional flag to specify number of times text should be printed.
+This step-by-step guide would be not complete without subcommand with command line arguments and options. Let's build subcommand that prints input text several times. By default it will print text once but we will add flag-based option to specify number of times input text should be printed. For instance: `any-tool print --times 5 "text to print"`.
 
-Maybe monad
-Pattern matching
+Maybe monad and Pattern matching make implementation of optional values trivial. Function will accept tuple of `Maybe Int` with number of times we have to repeat `Text` passed as second element of the tuple.
 
 ```haskell
 printText :: (Maybe Int, Text) -> IO()
@@ -144,15 +149,17 @@ printText (Nothing, text) = echo text
 printText ((Just i), text) = replicateM_ i (echo text)
 ```
 
-Arguments
-Options
-Optional
+Now we need to define wrapper for `printText` function. We can take a look at [Turtle documentation][turtle-options].
+To create optional `--times` or '-n' option we will use `optional` to convert result of `optInt` to Maybe monad.
+To create positional argument we will use `argText`.
 
 ```haskell
 printArgs :: Parser (Maybe Int, Text)
 printArgs = (,) <$> optional (optInt "times" 'n' "Number of times")
-                 <*> (argText "text" "Text to print")
+                <*> (argText "text" "Text to print")
 ```
+
+Then combine `printText` and `printArgs` with subcommand name and help message
 
 ```haskell
 parsePrint :: Parser (IO ())
@@ -171,14 +178,18 @@ Here we are. Build and run.
 ```shell
 $ any-tool print
 Usage: any-tool print [-n|--times TIMES] TEXT
+```
 
+We forgot required argument and turtle prints how to use `print` subcommand.
+
+```shell
 $ any-tool print "text to print"
 text to print
 
-$ any-tool print --times 3 "appears it 3 times"
-appears it 3 times
-appears it 3 times
-appears it 3 times
+$ any-tool print --times 3 "it will appear 3 times"
+it will appear 3 times
+it will appear 3 times
+it will appear 3 times
 ```
 
 And last but not least take a look at result help for main command and for `print` subcommand
@@ -195,11 +206,13 @@ Available options:
 Available commands:
   version
   print
+```
 
+```haskell
 $ any-tool print --help
 Print specified text specified number of times
 
-Usage: any-tool.exe print [-n|--times TIMES] TEXT
+Usage: any-tool print [-n|--times TIMES] TEXT
 
 Available options:
   -h,--help                Show this help text
@@ -207,8 +220,28 @@ Available options:
   TEXT                     Text to print
 ```
 
-8. Extend your tool following Turtle tutorial
+### Step 8. Extend your tool following Turtle tutorial
 
+Strictly speaking it's better not to mix parsing logic and logic of your application. One of the improvements is to define command data type so parser will return command and then main will execute command. Something like presented below:
+
+```haskell
+data Command = Add Int | Subtract Int | Divide Int | Multiply Int
+
+-- and then have something like this
+main = do
+    cmd <- options "Just any tool you could imagine" commandParser
+    exec cmd
+```
+
+## Conclusions
+
+At the matter of fact Turtle is mainly focused to write shell scripts on Haskell but it also allows us to build pretty advanced command-line tools. If you are interested in more information about Turtle take a look at [official site] and [tutorial][turtle-tutorial].
+You can find code from this blog post [here on github][src]
+Happy coding!
 
 [fp-edx]: https://www.edx.org/course/introduction-functional-programming-delftx-fp101x-0
 [quipper]: http://www.mathstat.dal.ca/~selinger/quipper/
+[turtle]: https://hackage.haskell.org/package/turtle
+[turtle-tutorial]: https://hackage.haskell.org/package/turtle-1.2.4/docs/Turtle-Tutorial.html
+[turtle-options]: https://hackage.haskell.org/package/turtle-1.2.4/docs/Turtle-Options.html#g:2
+[src]: https://github.com/mylifeecho/any-tool
