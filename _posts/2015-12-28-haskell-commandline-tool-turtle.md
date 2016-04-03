@@ -7,7 +7,7 @@ tags: [ Haskell, Turtle ]
 ---
 {% include JB/setup %}
 
-After finishing [Introduction to Functional Programming][fp-edx] course on *edx* (which was mainly focused on Haskell) I was very excited about this language. Concise, powerful type inference system, designed to make functional programming easy to write and read. I have even found out that it has a few concepts that corresponds with quantum physics. And actually I'm not the only one. There is even library called [quipper][quipper] to program quantum computer (which does not exists yet) based on Haskell... but it's a topic for another article. Then I started to feel that Haskell is awesome but it's most likely too complex and too academic to be applied for regular tasks. You remember "There is no bad or good languages, tools, technologies, etc. You should choose appropriate technology to solve your problem in most efficient way." That feeling is described perfectly in [this][hhh] blog post. I started to look for proofs and opinions on the Internet to confirm my bad feeling, but instead I found out that Haskell is mature enough to become technology of chose for many applications. And this time we are going to build simple command-line tool on Haskell and see how easy it is.
+After finishing [Introduction to Functional Programming][fp-edx] course on *edx* (which was mainly focused on Haskell) I was very excited about this language. Concise, powerful type inference system, designed to make functional programming easy to write and read. I have even found out that it has a few concepts that corresponds with quantum physics. And actually I'm not the only one. There is even library called [quipper][quipper] to program quantum computer (which does not exists yet) based on Haskell... but it's a topic for another article. Then I started to feel that Haskell is awesome but it's most likely too complex and too academic to be applied for regular tasks. You remember "There is no bad or good languages, tools, technologies, etc. You should choose appropriate technology to solve your problem in most efficient way." I started to look for proofs and opinions on the Internet to confirm my bad feeling, but instead I found out that Haskell is mature enough to become technology of chose for many applications. And this time we are going to build simple command-line tool on Haskell and see how easy it is.
 
 ## Step-by-step tutorial:
 ### Step 1. Create `any-tool` using Stack
@@ -241,6 +241,7 @@ You can find source code from this blog post [here on github][src]
 
 Happy coding!
 
+[stack]: http://docs.haskellstack.org/en/stable/README/
 [fp-edx]: https://www.edx.org/course/introduction-functional-programming-delftx-fp101x-0
 [quipper]: http://www.mathstat.dal.ca/~selinger/quipper/
 [turtle]: https://hackage.haskell.org/package/turtle
