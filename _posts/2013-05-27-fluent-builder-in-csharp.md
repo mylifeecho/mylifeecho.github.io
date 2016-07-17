@@ -147,6 +147,6 @@ public class PageBuilder : IFirstStep, ISecondStep
 
 And how it looks for developer who uses this builder.
 
-![example]({{ BASE_PATH}}/assets/posts/2013-05-27/flient-builder-use.png)
+![example]({{ BASE_PATH}}/assets/posts/2013-05-27/fluent-builder-use.png)
 
 [itextsharp]: http://sourceforge.net/projects/itextsharp/

@@ -10,5 +10,5 @@ You can look at my CV [here][cv] and information about certifications [here][cer
 
 Feel free to contact me, you can find all necessary information in CV.
 
-[cv]: http://db.tt/D8VYam62
+[cv]: {{ BASE_PATH }}/assets/alexey-rodiontsev-cv.pdf
 [cert]: {{ BASE_PATH }}/certifications
