@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "TODO"
-description: "TODO"
+title: "Tutorial: Telegram bookstore bot in Haskell"
+description: "Recently Telegram rolled out their new update for [Telegram Bot API][telegram-bot-api] that introduced payments. So now developers can build merchant bots. In this tutorial, we are going to create a simple bookstore bot that will sell these wonderful [O'RLY books][orly-books] that teach as how to build better software."
 category: dev
 tags: [ Haskell, Telegram, Bot ]
 ---
@@ -10,7 +10,7 @@ tags: [ Haskell, Telegram, Bot ]
 # Intro
 
 Recently Telegram rolled out their new update for [Telegram Bot API][telegram-bot-api] that introduced payments. So now developers can build merchant bots.
-In this tutorial, we are going to create a simple bookstore bot that would sell these wonderful [O'RLY books][orly-books] that teach as how to build better software.
+In this tutorial, we are going to create a simple bookstore bot that will sell these wonderful [O'RLY books][orly-books] that teach as how to build better software.
 We will go through the process of making a new bot from scratch, creating and debugging webhook, extending it to list books and conduct payments using test payments provider.
 And all of that in Haskell!
 
@@ -454,9 +454,10 @@ you should see something like this:
 
 ![Telegram Client - Result]({{ BASE_PATH}}/assets/posts/2017-05-31-bookstore-bot/result.jpg)
 
-The bot will print something like this in output:
+The bot will print something like this in the output:
 
 ```
+ORLY book store bot is starting...
 "We have earned USD45. Shipping book to the client!"
 ```
 
@@ -466,7 +467,7 @@ We went through the several steps in this tutorial,
 started with the simple web application based on [Servant][servant] that returns its version,
 added webhook that the Telegram servers will use to send updates to our bot,
 added handlers for different types of commands our bot can understand,
-such as `/help`, `/books`, /find title`, 
+such as `/help`, `/books`, `/find title`, 
 and added support for payment mechanism to allow users to buy books.
 
 You can take a look at the complete [source code][src] of the bot on Github and implement your own bot.
