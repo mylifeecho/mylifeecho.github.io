@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Tutorial: Telegram bookstore bot in Haskell"
-description: "Recently Telegram rolled out their new update for [Telegram Bot API][telegram-bot-api] that introduced payments. So now developers can build merchant bots. In this tutorial, we are going to create a simple bookstore bot that will sell these wonderful [O'RLY books][orly-books] that teach as how to build better software."
+description: "Recently Telegram rolled out their new update for Telegram Bot API that introduced payments. So now developers can build merchant bots. In this tutorial, we are going to create a simple bookstore bot that will sell these wonderful O'RLY books that teach as how to build better software."
 category: dev
 tags: [ Haskell, Telegram, Bot ]
 ---
