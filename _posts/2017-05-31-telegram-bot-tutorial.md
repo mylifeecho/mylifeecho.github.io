@@ -396,7 +396,7 @@ Your bot should send you messages with *Pay* button with the price on it for eve
 
 You should see something like this.
 
-![Telegram Client - Books]({{ BASE_PATH}}/assets/posts/2017-05-31-bookstore-bot/books_invoices.jpg)
+<img width="80%" src="{{ BASE_PATH}}/assets/posts/2017-05-31-bookstore-bot/books_invoices.jpg" />
 
 And like this if you send `/find Whiteboard` and `/help` or any other unrecognized message to the bot.
 
