@@ -19,9 +19,9 @@ It would make this tutorial unneccessary bigger and there are much better explan
 I will try to provide some useful links you can use to understand better what's going on.*
 
 I'm going to use [haskell-telegram-api][haskell-telegram-api], Telegram Bot API bindings based on [Servant][servant] library and Servant library itself to create a webhook for our bot.
-Webhook based implementation makes our bot more responsive in comparison with polling based model but would require our bot to be accessible by Telegram servers on the Internet. This makes it harder to develop bot, but we will solve this issue using [Ngrok][ngrok].
+Webhook based implementation makes our bot more responsive in comparison with polling based model but would require our bot to be accessible by Telegram servers on the Internet. This makes it harder to develop bot, but we will solve this issue using [ngrok][ngrok].
 You can read more about receiveing updates from Telegram [here][receiving-updates].
-In this tutorial, Telegram will call our webhook to notify our bot of user's actions and the bot will react on them.
+In this tutorial, Telegram will call the webhook to notify our bot of user's actions and the bot will react on them.
 
 There are two ways to interact with the Telegram servers when the webhook is called.
 You can directly answer Telegram's webhook requests with an appropriate response to user action like send him a message.
@@ -35,9 +35,11 @@ We are going to use the later one because it makes it simpler and at the moment 
 
 In order to start we need to
 
-* register our bot with [@BotFather][botfather] and receive *bot token*. Keep it secret! See more information about registering your bot on official Telegram [page][reg-bot].
-* obtain test *payment token* from [@BotFather][botfather]. Keep it secret too!
-* install [ngrok][ngrok] or any other simial tool.
+1) register our bot with [@BotFather][botfather] and receive *bot token*. Keep it secret! See more information about registering your bot on official Telegram [page][reg-bot].
+
+2) obtain test *payment token* from [@BotFather][botfather]. Keep it secret too!
+
+3) install [ngrok][ngrok] or any other simial tool.
 
 I assume you already have [stack][stack] and some [Haskell IDE][haskell-ide] installed.
 
@@ -85,7 +87,7 @@ import Data.Maybe
 import Data.Monoid
 import Web.Telegram.API.Bot
 import System.Environment
-import qualifield aths_orly_booksstore_bot (version) as P
+import qualified aths_orly_booksstore_bot (version) as P
 import Data.Version (showVersion)
 
 ```
@@ -113,7 +115,7 @@ It brings you a lot of useful features, but I'd refer you to Servant documentati
 We are going to define this type for version page to start with and later extend it with webhook resource.
 
 ```haskell
--- We needed some of those language extensions to make it as simple as that
+-- We needed some of those language extensions to make it that simple
 data Version = Version
   { version :: Text
   } deriving (Show, Generic)
@@ -162,7 +164,7 @@ $ curl http://localhost:8080/version
 {"version":"0.1.0.0"}
 ```
 
-# Step 2: Create Bot monad transformer and configuration data record
+# Step 2: Create Bot monad transformer and configuration
 
 Strictly speaking part of this step is not required and a bit advanced for simple bot implementation.
 We are going to create a `Bot` monad only to improve the way we read configuration and reduce the amount of boilerplate code,
@@ -173,13 +175,13 @@ Let's define Bot monad transformer stack:
 ```haskell
 newtype Bot a = Bot
     { runBot :: ReaderT BotConfig Handler a
-    } deriving ( Functor, Applicative, Monad, MonadIO -- classes from base and transformers
-                 MonadReader BotConfig, MonadError ServantErr) -- classes from mtl
+    } deriving ( Functor, Applicative, Monad, MonadIO
+                 MonadReader BotConfig, MonadError ServantErr)
 ```
 
 where `Handler` is Servant's Handler which is nothing more than just a type alias for `ExceptT ServantError IO`.
 The `Bot` type is accompanied by the classic set of deriving instances (don't forget to put `GeneralizedNewtypeDeriving` language extension on the top of the file).
-You can read more about it [here][mtl-transformers].
+You can read more about monad transformers on [wiki books][wikibooks-transformers], about deriving mtl typeclasses [here][mtl-transformers], and more about `ReaderT` [here][readert].
 
 `BotConfig` is a read-only configuration that will be used by the bot.
 It will be data record that we will build on application start up.
@@ -190,7 +192,6 @@ data BotConfig = BotConfig
   , paymentsToken :: Text
   , manager :: Manager
   }
-
 ```
 
 In order to initialize our bot with configuration let's change `startApp` and `app` functions. 
@@ -216,7 +217,7 @@ app :: BotConfig -> Application
 app config = serve botApi $ initBotServer config
 ```
 
-Now we need to change our `botServer` function signature to return `ServerT BotAPI Bot` because we want to work with `Bot` monad and implement an `initBotServer` function that will do natural transformation for it.
+Now we need to change our `botServer` function signature to return `ServerT BotAPI Bot` because we want to work with `Bot` monad and implement an `initBotServer` function that will do natural transformation from our `Bot` monad to to Servant's `ExceptT ServantErr IO` and initialize server.
 
 ```haskell
 botServer :: ServerT BotAPI Bot
@@ -242,9 +243,9 @@ It's time to create a webhook for our bot!
 At first, we will extend `BotAPI` type to have webhook resource defined there.
 For the webhook we need to make sure that our bot accepts request only from Telegram's servers.
 So as it's suggested in their [documentation][telegram-webhook] it's fine to use bot's token itself as the path parameter.
-They will send POST request with `Update` object (from Telegram Bot API) to the webhook and we will validate secret token in path parameter to authorize Telegram.
+They will send POST request with `Update` object (from [telegram-api][haskell-telegram-api]) to the webhook and we will validate secret token in the path parameter to authorize Telegram.
 If validation was successful our bot will handle `Update` message.
-Servant library provides us `Capture` combinator that we will use to read the secret token.
+Servant library provides us `Capture` combinator that we will use to read the secret token from the path parameter.
 
 The final version of the `BotAPI` looks like this:
 
@@ -282,7 +283,7 @@ handleUpdate update = do
 
 Compile and run your bot with `stack`. It's time to test it.
 
-# Test your bot with Ngrok
+# Test your bot with ngrok
 
 In order to test the bot from our local machine, we would need some tunnel to make our bot that is running locally accessible from the Internet. 
 Personally, I use [ngrok][ngrok].
@@ -311,7 +312,7 @@ The bot will print it to output and you can see it in your terminal window, but 
 
 Our bot does not do much at the moment. 
 It does not even send any messages yet to the client. 
-Time to change it.
+It's time to change it.
 Define help message request and go to the `handleUpdate` function. 
 
 ```haskell
@@ -483,7 +484,9 @@ You can take a look at the complete [source code][src] of the bot on Github and 
 [haskell-ide]: https://wiki.haskell.org/IDEs
 [haskell-telegram-api]: https://github.com/klappvisor/haskell-telegram-api
 [servant]: https://haskell-servant.readthedocs.io/en/stable/
+[wikibooks-transformers]: https://en.wikibooks.org/wiki/Haskell/Monad_transformers
 [mtl-transformers]: https://lexi-lambda.github.io/blog/2017/04/28/lifts-for-free-making-mtl-typeclasses-derivable/
+[readert]: http://dev.stephendiehl.com/hask/#readert
 [telegram-webhook]: https://core.telegram.org/bots/api#setwebhook
 [ngrok]: https://ngrok.com/
 [payments-step-by-step]: https://core.telegram.org/bots/payments#step-by-step-process
