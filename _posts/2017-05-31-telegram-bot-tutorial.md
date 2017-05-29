@@ -396,11 +396,11 @@ Your bot should send you messages with *Pay* button with the price on it for eve
 
 You should see something like this.
 
-<img width="80%" src="{{ BASE_PATH}}/assets/posts/2017-05-31-bookstore-bot/books_invoices.jpg" />
+<img width="80%" src="{{ BASE_PATH}}/assets/posts/2017-05-31-bookstore-bot/books_invoices.jpg" alt="Telegram Client - Books" />
 
 And like this if you send `/find Whiteboard` and `/help` or any other unrecognized message to the bot.
 
-![Telegram Client - Find and Help]({{ BASE_PATH}}/assets/posts/2017-05-31-bookstore-bot/find_and_help.jpg)
+<img width="80%" src="{{ BASE_PATH}}/assets/posts/2017-05-31-bookstore-bot/find_and_help.jpg" alt="Telegram Client - Find and Help" />
 
 # Step 7: Accept payments
 
@@ -453,7 +453,7 @@ Try to buy any book from our bot and after completing all steps
 using test credit cart `4242 4242 4242 4242` with arbitrary CVV
 you should see something like this:
 
-![Telegram Client - Result]({{ BASE_PATH}}/assets/posts/2017-05-31-bookstore-bot/result.jpg)
+<img width="80%" src="{{ BASE_PATH}}/assets/posts/2017-05-31-bookstore-bot/result.jpg" alt="Telegram Client - Result" />
 
 The bot will print something like this in the output:
 
