@@ -236,7 +236,7 @@ Compile and run. At that point, your bot should be returning version page as bef
 Note that even though we used unsafe functions `fromJust` to get tokens our application is working fine.
 Haskell is really lazy and it saves our application from crashing on startup.
 
-# Add webhook
+# Step 3: Add webhook
 
 It's time to create a webhook for our bot!
 
@@ -283,7 +283,7 @@ handleUpdate update = do
 
 Compile and run your bot with `stack`. It's time to test it.
 
-# Test your bot with ngrok
+# Step 4: Test your bot with ngrok
 
 In order to test the bot from our local machine, we would need some tunnel to make our bot that is running locally accessible from the Internet. 
 Personally, I use [ngrok][ngrok].
@@ -308,7 +308,7 @@ curl "https://api.telegram.org/bot$TELEGRAM_TOKEN/setWebhook?url=https://<ngrok_
 Now you can go to Telegram client and send any message you want to your bot.
 The bot will print it to output and you can see it in your terminal window, but won't respond to the client.
 
-# First interaction (help command)
+# Step 5: First interaction (help command)
 
 Our bot does not do much at the moment. 
 It does not even send any messages yet to the client. 
@@ -343,7 +343,7 @@ handleMessage msg = do
 `handleUpdate` uses pattern matching to match on `Update` object when `handleMessage`, in turn, matches on message content. You can see trick with pattern matching on text prefix in the implementation of the `onCommand` function: `(Just (T.stripPrefix "/command" -> Just args)) = ...`.
 `onCommand` returns operations that `runClient` will execute, so now we can extend list of supported commands by defining new patterns.
 
-# List books and send invoices
+# Step 6: List books and send invoices
 
 Finally we came to the point when we will send books to the users with special button to pay for them.
 
@@ -402,7 +402,7 @@ And like this if you send `/find Whiteboard` and `/help` or any other unrecogniz
 
 ![Telegram Client - Find and Help]({{ BASE_PATH}}/assets/posts/2017-05-31-bookstore-bot/find_and_help.jpg)
 
-# Accept payments
+# Step 7: Accept payments
 
 Step by step process to send invoices and confirm payment described in details on official [Telegram documentation page][payments-step-by-step].
 
