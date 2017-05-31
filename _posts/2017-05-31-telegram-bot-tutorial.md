@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Tutorial: Telegram bookstore bot in Haskell"
+title: "Write yourself a Telegram bookstore bot in Haskell"
 description: "Recently Telegram rolled out their new update for Telegram Bot API that introduced payments. So now developers can build merchant bots. In this tutorial, we are going to create a simple bookstore bot that will sell these wonderful O'RLY books that teach as how to build better software."
 category: dev
 tags: [ Haskell, Telegram, Bot ]
@@ -14,7 +14,7 @@ In this tutorial, we are going to create a simple bookstore bot that will sell t
 We will go through the process of making a new bot from scratch, creating and debugging webhook, extending it to list books and conduct payments using test payments provider.
 And all of that in Haskell!
 
-*Note: You won't find here the detailed explanation of different Haskell features.
+*Note: You won't find here the detailed explanation of different Haskell features like monad transformers, natural transformation, etc.
 It would make this tutorial unneccessary bigger and there are much better explanations on the Internet.
 I will try to provide some useful links you can use to understand better what's going on.*
 
@@ -76,31 +76,31 @@ But comment out it for now.
 Add these imports to the `src/Libs.hs` file:
 
 ```haskell
-import GHC.Generics
-import Control.Monad.Reader
-import Control.Monad.Except
-import Data.Text (Text)
+import           GHC.Generics
+import           Control.Monad.Reader
+import           Control.Monad.Except
+import           Data.Text (Text)
 import qualified Data.Text as T
-import Network.HTTP.Client (Manager)
-import Network.HTTP.Client.TLS  (tlsManagerSettings)
-import Data.Maybe
-import Data.Monoid
-import Web.Telegram.API.Bot
-import System.Environment
-import qualified aths_orly_booksstore_bot (version) as P
-import Data.Version (showVersion)
+import           Network.HTTP.Client (Manager)
+import           Network.HTTP.Client.TLS  (tlsManagerSettings)
+import           Data.Maybe
+import           Data.Monoid
+import           Web.Telegram.API.Bot
+import           System.Environment
+import qualified Paths_orly_bookstore_bot (version) as P
+import           Data.Version (showVersion)
 
 ```
 
 Same for the language extensions. These are very useful ones:
 
 ```haskell
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE ViewPatterns               #-}
+{-# LANGUAGE RecordWildCards            #-}
 ```
 
 Some of the imports and extentions are not needed at the moment, but we will need them later.
@@ -108,11 +108,13 @@ Some of the imports and extentions are not needed at the moment, but we will nee
 # Step 1: Create version resource with Servant
 
 As the first step, I'd like to focus on Servant and create simple version resource to make you familiar with Servant library.
-If you already know this you can skip this step and go to Step 2.
+If you already know it you can skip this step and go to the Step 2.
 
-The main idea of Servant is that your Web API can be defined and described entirely by the type.
-It brings you a lot of useful features, but I'd refer you to Servant documentation to get more information on that.
+The main idea of Servant is that your Web API can be defined and described entirely by its type.
+It brings you a lot of useful features, compile time check for API documentation, client generation and so on, but I'd refer you to Servant documentation to get more information on that.
 We are going to define this type for version page to start with and later extend it with webhook resource.
+
+Final `src/Lib.hs` should look like:
 
 ```haskell
 -- We needed some of those language extensions to make it that simple
@@ -166,7 +168,7 @@ $ curl http://localhost:8080/version
 
 # Step 2: Create Bot monad transformer and configuration
 
-Strictly speaking part of this step is not required and a bit advanced for simple bot implementation.
+Strictly speaking part of this step is not required and a bit advanced for basic bot implementation.
 We are going to create a `Bot` monad only to improve the way we read configuration and reduce the amount of boilerplate code,
 but for the sake of simplicity, you can pass configuration parameter manually.
 
@@ -182,9 +184,10 @@ newtype Bot a = Bot
 where `Handler` is Servant's Handler which is nothing more than just a type alias for `ExceptT ServantError IO`.
 The `Bot` type is accompanied by the classic set of deriving instances (don't forget to put `GeneralizedNewtypeDeriving` language extension on the top of the file).
 You can read more about monad transformers on [wiki books][wikibooks-transformers], about deriving mtl typeclasses [here][mtl-transformers], and more about `ReaderT` [here][readert].
+There is very nice [blog post][servant-persistent] that shows how to build web application with Servant.
 
 `BotConfig` is a read-only configuration that will be used by the bot.
-It will be data record that we will build on application start up.
+It is a data record that we will build on application start up.
 
 ```haskell
 data BotConfig = BotConfig 
@@ -194,7 +197,7 @@ data BotConfig = BotConfig
   }
 ```
 
-In order to initialize our bot with configuration let's change `startApp` and `app` functions. 
+In order to initialize our bot with configuration, let's change `startApp` and `app` functions. 
 We will read bot settings from environment variables using `getEnvironment` function from `System.Environment` module,
 build `BotConfig` and initialize our bot with it.
 
@@ -404,13 +407,12 @@ And like this if you send `/find Whiteboard` and `/help` or any other unrecogniz
 
 # Step 7: Accept payments
 
-Step by step process to send invoices and confirm payment described in details on official [Telegram documentation page][payments-step-by-step].
+Step by step process to send invoices and confirm payment is described in details on official [Telegram documentation page][payments-step-by-step].
 
-We are not going to add shipping related funcitonality, but we do need to extend out bot to compete payments.
+We are not going to add shipping related funcitonality, but we do need to extend our bot to compete payments.
 In order to do so we will extend `handleUpdate` function to handle different type of `Update`s. 
 Telegram will send us `pre_checkout_query` and our bot must reply with `answerPrecheckoutQueryM` within 10 seconds.
 If everything is OK, Telegram will call webhook with an update containing `Message` with `successful_payment` to confirm payment and complete transaction.
-Now we can send user's order to him.
 
 So we need `handlePreCheckout` function to answer pre checkout query from Telegram:
 
@@ -425,7 +427,7 @@ handlePreCheckout query = do
     return ()
 ```
 
-And `handleSucccessfulPayment` function where will "trigger" book shipment to the client.
+And `handleSucccessfulPayment` function where we will "trigger" shipment of the book to the client.
 
 ```haskell
 handleSuccessfulPayment :: SuccessfulPayment -> Bot ()
@@ -436,7 +438,7 @@ handleSuccessfulPayment payment = do
     return ()
 ```
 
-And last step is to extend `handleUpdate` function to use these functions.
+And last step is to extend `handleUpdate` to use these functions.
 
 ```haskell
 handleUpdate update = do
@@ -449,13 +451,13 @@ handleUpdate update = do
 
 Build and run. Now our bot can do payments!
 
-Try to buy any book from our bot and after completing all steps
-using test credit cart `4242 4242 4242 4242` with arbitrary CVV
+Try to buy any book from our bot. After going through all steps
+using test credit card `4242 4242 4242 4242` with arbitrary CVV
 you should see something like this:
 
 <img width="60%" src="{{ BASE_PATH}}/assets/posts/2017-05-31-bookstore-bot/result.jpg" alt="Telegram Client - Result" />
 
-The bot will print something like this in the output:
+The bot will print the following message to the output:
 
 ```
 ORLY book store bot is starting...
@@ -465,13 +467,16 @@ ORLY book store bot is starting...
 # Conclusions
 
 We went through the several steps in this tutorial,
-started with the simple web application based on [Servant][servant] that returns its version,
+started with the simple web application based on [Servant][servant] that returns only its version,
 added webhook that the Telegram servers will use to send updates to our bot,
 added handlers for different types of commands our bot can understand,
 such as `/help`, `/books`, `/find title`, 
 and added support for payment mechanism to allow users to buy books.
 
-You can take a look at the complete [source code][src] of the bot on Github and implement your own bot.
+Now you can extend your bot, add new features like inline mode, change text commands to buttons,
+add automatic webhook configuration on startup, and so on. Almost every feature of Telegram Bot API is suported by [haskell-telegram-api][haskell-telegram-api]. 
+
+You can take a look at the complete [source code][src] of the bot on Github and implement your own.
 
 [telegram-bot-api]: https://core.telegram.org/bots/api
 [orly-books]: http://imgur.com/gallery/vqUQ5
@@ -484,6 +489,7 @@ You can take a look at the complete [source code][src] of the bot on Github and 
 [haskell-ide]: https://wiki.haskell.org/IDEs
 [haskell-telegram-api]: https://github.com/klappvisor/haskell-telegram-api
 [servant]: https://haskell-servant.readthedocs.io/en/stable/
+[servant-persistent]: http://www.parsonsmatt.org/2016/07/08/servant-persistent_updated.html
 [wikibooks-transformers]: https://en.wikibooks.org/wiki/Haskell/Monad_transformers
 [mtl-transformers]: https://lexi-lambda.github.io/blog/2017/04/28/lifts-for-free-making-mtl-typeclasses-derivable/
 [readert]: http://dev.stephendiehl.com/hask/#readert
