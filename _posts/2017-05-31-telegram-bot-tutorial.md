@@ -19,7 +19,8 @@ It would make this tutorial unneccessary bigger and there are much better explan
 I will try to provide some useful links you can use to understand better what's going on.*
 
 I'm going to use [haskell-telegram-api][haskell-telegram-api], Telegram Bot API bindings based on [Servant][servant] library and Servant library itself to create a webhook for our bot.
-Webhook based implementation makes our bot more responsive in comparison with polling based model but would require our bot to be accessible by Telegram servers on the Internet. This makes it harder to develop bot, but we will solve this issue using [ngrok][ngrok].
+Webhook based implementation makes our bot more responsive in comparison with polling based model but would require our bot to be accessible by Telegram servers on the Internet.
+It makes it harder to develop and debug your bot, but we will solve this issue using [ngrok][ngrok].
 You can read more about receiveing updates from Telegram [here][receiving-updates].
 In this tutorial, Telegram will call the webhook to notify our bot of user's actions and the bot will react on them.
 
